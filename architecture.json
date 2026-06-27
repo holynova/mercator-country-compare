@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Mercator Projection Lab",
+    "subtitle": "Interactive Multi-Country Comparison System — Architecture Diagram",
+    "output": "architecture.html"
+  },
+  "components": [
+    { "id": "user", "type": "external", "label": "User / Browser", "sublabel": "Pointer & Click Interaction", "pos": [40, 280], "size": [120, 60] },
+    { "id": "sidebar", "type": "frontend", "label": "Sidebar Controls", "sublabel": "Search, Presets, Stats", "pos": [230, 160], "size": [130, 60] },
+    { "id": "overlay", "type": "frontend", "label": "SVG Overlay", "sublabel": "Draggable Country Paths", "pos": [450, 160], "size": [140, 60], "tag": "React.memo optimized" },
+    { "id": "maplibre", "type": "frontend", "label": "MapLibre Canvas", "sublabel": "WebGL Map & Zoom/Pan", "pos": [450, 400], "size": [140, 60] },
+    { "id": "d3geo", "type": "backend", "label": "D3-Geo Engine", "sublabel": "Mercator Projection", "pos": [680, 160], "size": [130, 60] },
+    { "id": "spherical", "type": "backend", "label": "Spherical Engine", "sublabel": "Great-Circle Navigation", "pos": [680, 280], "size": [130, 60], "tag": "Isotropic translation" },
+    { "id": "topojson", "type": "database", "label": "TopoJSON DB", "sublabel": "countries-110m.json", "pos": [890, 160], "size": [130, 60] },
+    { "id": "cartodb", "type": "external", "label": "CartoDB CDN", "sublabel": "Vector Tile Server", "pos": [680, 400], "size": [130, 60] },
+    { "id": "ghpages", "type": "cloud", "label": "GitHub Pages", "sublabel": "HTTPS static host", "pos": [230, 400], "size": [130, 60] }
+  ],
+  "boundaries": [
+    { "kind": "region", "label": "Local Client Runtime (Browser Environment)", "wraps": ["sidebar", "overlay", "maplibre", "d3geo", "spherical", "topojson"] },
+    { "kind": "security-group", "label": "Core App Logic", "wraps": ["sidebar", "overlay", "d3geo", "spherical"] }
+  ],
+  "connections": [
+    { "from": "user", "to": "sidebar", "label": "UI click", "variant": "emphasis" },
+    { "from": "user", "to": "overlay", "label": "drag path", "variant": "emphasis", "fromSide": "right", "toSide": "left" },
+    { "from": "sidebar", "to": "overlay", "label": "active state", "fromSide": "right", "toSide": "left" },
+    { "from": "overlay", "to": "d3geo", "label": "project path", "fromSide": "right", "toSide": "left" },
+    { "from": "d3geo", "to": "spherical", "label": "bearing/dist", "fromSide": "bottom", "toSide": "top", "labelDx": -110 },
+    { "from": "spherical", "to": "topojson", "label": "load coordinates", "fromSide": "right", "toSide": "bottom", "labelDx": -80, "labelDy": 20 },
+    { "from": "maplibre", "to": "overlay", "label": "sync zoom/pan", "variant": "dashed", "fromSide": "top", "toSide": "bottom" },
+    { "from": "maplibre", "to": "cartodb", "label": "vector styles", "fromSide": "right", "toSide": "left" },
+    { "from": "ghpages", "to": "user", "label": "serves web bundle", "variant": "dashed", "fromSide": "left", "toSide": "bottom" }
+  ],
+  "cards": [
+    { "dot": "cyan", "title": "Client UI / Overlay", "items": ["Vite-bundled React single-page app", "Fast CSS custom layout & glassmorphic dashboard", "React.memo-backed SVG overlay handles smooth drag performance"] },
+    { "dot": "emerald", "title": "Spherical Navigation", "items": ["Computes exact bearing and angular distance on a sphere", "Transforms raw shape coordinates to prevent anisotropy skewing", "D3-Geo handles Web Mercator projection conversion dynamically"] },
+    { "dot": "rose", "title": "External Resources", "items": ["TopoJSON boundaries bundled locally (110m low-poly resolution)", "CartoDB CDN serves maps dynamically (Dark Matter / Positron)", "Served statically from GitHub Pages via master branch docs/ folder"] }
+  ]
+}
