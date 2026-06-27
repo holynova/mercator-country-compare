@@ -233,7 +233,8 @@ const CountryOverlayPath = memo(({
             stroke: country.color,
             fillOpacity: opacity,
             strokeOpacity: showOutline ? 1 : 0,
-          }}
+            '--glow-color': country.color,
+          } as React.CSSProperties}
           onPointerDown={(e) => onDragStart(e, country.instanceId)}
         />
       )}
@@ -246,6 +247,7 @@ function App() {
   const mapRef = useRef<maplibregl.Map | null>(null)
   const dragCleanupRef = useRef<(() => void) | null>(null)
   const currentStyleRef = useRef<MapStyle>('dark')
+  const searchContainerRef = useRef<HTMLDivElement | null>(null)
 
   const [activeCountries, setActiveCountries] = useState<ActiveCountry[]>(() => {
     const defaultCountry = COUNTRIES.find((c) => c.sourceName === 'China') ?? COUNTRIES[0]
@@ -268,14 +270,27 @@ function App() {
   const [draggingInstanceId, setDraggingInstanceId] = useState<string | null>(null)
   const [mapStyle, setMapStyle] = useState<MapStyle>('dark')
   const [searchQuery, setSearchQuery] = useState('')
+  const [showSearchDropdown, setShowSearchDropdown] = useState(false)
   const [opacity, setOpacity] = useState(DEFAULT_OPACITY)
   const [showOutline, setShowOutline] = useState(DEFAULT_SHOW_OUTLINE)
+  const [showAdvancedSettings, setShowAdvancedSettings] = useState(false)
   const [mapRenderTick, setMapRenderTick] = useState(0)
 
   // Track style in ref to use in events
   useEffect(() => {
     currentStyleRef.current = mapStyle
   }, [mapStyle])
+
+  // Click outside to close search dropdown
+  useEffect(() => {
+    const handleOutsideClick = (e: MouseEvent) => {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(e.target as Node)) {
+        setShowSearchDropdown(false)
+      }
+    }
+    document.addEventListener('mousedown', handleOutsideClick)
+    return () => document.removeEventListener('mousedown', handleOutsideClick)
+  }, [])
 
   // Memoize search/filter results
   const filteredCountries = useMemo(() => {
@@ -307,8 +322,6 @@ function App() {
         c.sourceName.toLowerCase().includes(query),
     )
   }, [searchQuery])
-
-
 
   // Initialize MapLibre
   useEffect(() => {
@@ -441,7 +454,7 @@ function App() {
     // Fly map to show the newly added country
     mapRef.current?.flyTo({
       center: country.center,
-      zoom: Math.max(INITIAL_ZOOM, mapRef.current?.getZoom() ?? INITIAL_ZOOM),
+      zoom: Math.max(INITIAL_ZOOM + 0.5, mapRef.current?.getZoom() ?? INITIAL_ZOOM),
       duration: 600,
     })
   }
@@ -623,47 +636,67 @@ function App() {
           </div>
         </section>
 
-        {/* 国家搜索与选择器 */}
-        <section className="country-picker-section" aria-label="添加对比国家">
+        {/* 国家搜索与选择器 (Combobox 下拉覆盖层设计) */}
+        <section className="country-picker-section" ref={searchContainerRef} aria-label="添加对比国家">
           <div className="section-label">
             <Plus size={16} weight="bold" />
-            搜索并添加国家 (最多8个)
+            添加对比国家 (最多8个)
           </div>
           <div className="search-box">
             <input
               type="text"
               placeholder="中/英文搜索世界国家..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onFocus={() => setShowSearchDropdown(true)}
+              onChange={(e) => {
+                setSearchQuery(e.target.value)
+                setShowSearchDropdown(true)
+              }}
               className="search-input"
             />
             {searchQuery && (
               <button
                 type="button"
                 className="search-clear"
-                onClick={() => setSearchQuery('')}
+                onClick={() => {
+                  setSearchQuery('')
+                  setShowSearchDropdown(true)
+                }}
               >
                 ×
               </button>
             )}
           </div>
-          <div className="country-grid">
-            {filteredCountries.slice(0, 18).map((country) => {
-              const isActive = activeCountries.some((item) => item.countryId === country.id)
-              return (
-                <button
-                  key={country.id}
-                  type="button"
-                  className={`country-button ${isActive ? 'active' : ''}`}
-                  onClick={() => addCountry(country.id)}
-                >
-                  {country.nameZh}
-                </button>
-              )
-            })}
-          </div>
-          {filteredCountries.length === 0 && (
-            <p className="no-results">未找到匹配的国家</p>
+          {showSearchDropdown && (
+            <div className="search-dropdown-overlay">
+              <div className="dropdown-title">
+                {searchQuery ? '搜索结果' : '热门推荐国家'}
+              </div>
+              <div className="dropdown-grid">
+                {filteredCountries.slice(0, 15).map((country) => {
+                  const isActive = activeCountries.some((item) => item.countryId === country.id)
+                  return (
+                    <button
+                      key={country.id}
+                      type="button"
+                      className={`country-dropdown-btn ${isActive ? 'active' : ''}`}
+                      onMouseDown={(e) => {
+                        e.preventDefault() // 防止 input 失去焦点
+                      }}
+                      onClick={() => {
+                        addCountry(country.id)
+                        setShowSearchDropdown(false)
+                      }}
+                    >
+                      {country.nameZh}
+                    </button>
+                  )
+                })}
+              </div>
+              {filteredCountries.length === 0 && (
+                <p className="no-results-dropdown">未找到匹配的国家</p>
+              )}
+            </div>
           )}
         </section>
 
@@ -726,15 +759,13 @@ function App() {
                       <div>
                         真实面积：<strong>{formatArea(item.areaKm2)}</strong>
                       </div>
-                      <div>
-                        纬度：从{' '}
-                        <strong>{formatCoordinate(item.originalCenter[1], 'lat')}</strong>{' '}
-                        移到{' '}
-                        <strong>{formatCoordinate(item.currentCenter[1], 'lat')}</strong>
-                      </div>
                       <div className="ratio-stat">
                         尺寸放大：<strong>{dimensionRatio.toFixed(2)}x</strong>
                         （面积放大：<strong>{areaRatio.toFixed(2)}x</strong>）
+                      </div>
+                      <div className="lat-stat-sub">
+                        纬度：{formatCoordinate(item.originalCenter[1], 'lat')} →{' '}
+                        {formatCoordinate(item.currentCenter[1], 'lat')}
                       </div>
                     </div>
                   </div>
@@ -749,66 +780,61 @@ function App() {
           )}
         </section>
 
-        {/* 控制设置 */}
-        <section className="controls" aria-label="显示控制">
-          <label className="range-field">
+        {/* 高级显示设置 (折叠手风琴设计) */}
+        <section className="advanced-settings-section" aria-label="显示控制">
+          <button
+            type="button"
+            className="accordion-header"
+            onClick={() => setShowAdvancedSettings(!showAdvancedSettings)}
+            aria-expanded={showAdvancedSettings}
+          >
             <span>
-              <Eye size={16} weight="bold" />
-              轮廓不透明度
-            </span>
-            <output>{Math.round(opacity * 100)}%</output>
-            <input
-              type="range"
-              min="15"
-              max="90"
-              value={Math.round(opacity * 100)}
-              onChange={(event) => setOpacity(Number(event.target.value) / 100)}
-            />
-          </label>
-
-          <div className="toggle-group">
-            <button
-              type="button"
-              className="toggle-button"
-              aria-pressed={showOutline}
-              onClick={() => setShowOutline((value) => !value)}
-            >
-              {showOutline ? <Eye size={16} weight="bold" /> : <EyeSlash size={16} weight="bold" />}
-              {showOutline ? '隐藏描边' : '显示描边'}
-            </button>
-
-            <button
-              type="button"
-              className="toggle-button reset-all-btn"
-              onClick={resetAllCountryCenters}
-              disabled={activeCountries.length === 0}
-            >
-              <ArrowsClockwise size={16} weight="bold" />
-              全部归位
-            </button>
-          </div>
-
-          <div className="style-selector">
-            <span className="selector-title">
               <Info size={16} weight="bold" />
-              选择底图风格
+              高级显示设置
             </span>
-            <div className="style-buttons">
-              {(['dark', 'light', 'voyager', 'minimal'] as MapStyle[]).map((style) => (
+            <span className={`chevron ${showAdvancedSettings ? 'open' : ''}`}>▼</span>
+          </button>
+          
+          {showAdvancedSettings && (
+            <div className="accordion-content">
+              <label className="range-field">
+                <span>
+                  <Eye size={16} weight="bold" />
+                  轮廓不透明度
+                </span>
+                <output>{Math.round(opacity * 100)}%</output>
+                <input
+                  type="range"
+                  min="15"
+                  max="90"
+                  value={Math.round(opacity * 100)}
+                  onChange={(event) => setOpacity(Number(event.target.value) / 100)}
+                />
+              </label>
+
+              <div className="toggle-group">
                 <button
-                  key={style}
                   type="button"
-                  className={`style-btn ${mapStyle === style ? 'active' : ''}`}
-                  onClick={() => setMapStyle(style)}
+                  className="toggle-button"
+                  aria-pressed={showOutline}
+                  onClick={() => setShowOutline((value) => !value)}
                 >
-                  {style === 'dark' && '暗黑极简'}
-                  {style === 'light' && '明亮极简'}
-                  {style === 'voyager' && '彩色详细'}
-                  {style === 'minimal' && '本地离线'}
+                  {showOutline ? <Eye size={16} weight="bold" /> : <EyeSlash size={16} weight="bold" />}
+                  {showOutline ? '隐藏描边' : '显示描边'}
                 </button>
-              ))}
+
+                <button
+                  type="button"
+                  className="toggle-button reset-all-btn"
+                  onClick={resetAllCountryCenters}
+                  disabled={activeCountries.length === 0}
+                >
+                  <ArrowsClockwise size={16} weight="bold" />
+                  全部归位
+                </button>
+              </div>
             </div>
-          </div>
+          )}
         </section>
 
         <div className="button-grid-global">
@@ -821,9 +847,43 @@ function App() {
             <SelectionSlash size={16} weight="bold" />
             清空对比看板
           </button>
+        </div>
+
+        <p className="note">
+          国家真实面积不变。视觉形变来自 Web Mercator 投影各向同性拉伸。将国家往赤道拖动，在经度和纬度两个方向会以相同比例收缩至真实物理大小。
+        </p>
+      </aside>
+
+      <section className="map-stage" aria-label="可拖动地图">
+        <div ref={mapNodeRef} className="map-canvas" />
+        
+        {/* Floating map controls on the map stage itself */}
+        <div className="map-controls-floating">
+          {/* Map style selector */}
+          <div className="floating-card style-selector-floating">
+            <span className="floating-title">地图风格</span>
+            <div className="style-buttons-mini">
+              {(['dark', 'light', 'voyager', 'minimal'] as MapStyle[]).map((style) => (
+                <button
+                  key={style}
+                  type="button"
+                  className={`style-btn-mini ${mapStyle === style ? 'active' : ''}`}
+                  onClick={() => setMapStyle(style)}
+                >
+                  {style === 'dark' && '暗黑'}
+                  {style === 'light' && '明亮'}
+                  {style === 'voyager' && '彩色'}
+                  {style === 'minimal' && '离线'}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Reset map view */}
           <button
             type="button"
-            className="btn-secondary"
+            className="floating-btn reset-view-floating"
+            title="复位地图视角"
             onClick={() => {
               mapRef.current?.flyTo({
                 center: INITIAL_CENTER,
@@ -832,18 +892,11 @@ function App() {
               })
             }}
           >
-            <Crosshair size={16} weight="bold" />
-            重置地图视角
+            <Crosshair size={14} weight="bold" />
+            复位地图
           </button>
         </div>
 
-        <p className="note">
-          国家真实面积不会改变。视觉形变来自 Web Mercator 投影。高纬度地区拉伸严重（如格陵兰拉伸为实际的14倍以上），拖向赤道会恢复真实面积大小。
-        </p>
-      </aside>
-
-      <section className="map-stage" aria-label="可拖动地图">
-        <div ref={mapNodeRef} className="map-canvas" />
         <svg className="country-overlay" aria-hidden="true">
           {mapRef.current &&
             activeCountries.map((item) => (
