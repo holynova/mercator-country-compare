@@ -18,6 +18,8 @@ import {
   Sparkle,
   Info,
   GithubLogo,
+  CaretLeft,
+  CaretRight,
 } from '@phosphor-icons/react'
 import maplibregl, {
   type LngLatLike,
@@ -274,6 +276,7 @@ function App() {
   const [opacity, setOpacity] = useState(DEFAULT_OPACITY)
   const [showOutline, setShowOutline] = useState(DEFAULT_SHOW_OUTLINE)
   const [showAdvancedSettings, setShowAdvancedSettings] = useState(false)
+  const [isPanelCollapsed, setIsPanelCollapsed] = useState(false)
   const [mapRenderTick, setMapRenderTick] = useState(0)
 
   // Track style in ref to use in events
@@ -594,7 +597,18 @@ function App() {
 
   return (
     <main className="app-shell">
-      <aside className="panel" aria-label="地图投影工具控制面板">
+      {/* 收纳侧边栏面板 */}
+      <aside className={`panel ${isPanelCollapsed ? 'collapsed' : ''}`} aria-label="地图投影工具控制面板">
+        {/* 面板内折叠收起按钮 */}
+        <button
+          type="button"
+          className="panel-toggle-btn-inside"
+          onClick={() => setIsPanelCollapsed(true)}
+          title="收起控制面板"
+        >
+          <CaretLeft size={16} weight="bold" />
+        </button>
+
         <div className="brand-block">
           <div className="brand-mark">
             <GlobeHemisphereEast size={24} weight="duotone" />
@@ -636,7 +650,7 @@ function App() {
           </div>
         </section>
 
-        {/* 国家搜索与选择器 (Combobox 下拉覆盖层设计) */}
+        {/* 国家搜索与选择器 (Combobox 内置折叠设计，不溢出遮挡) */}
         <section className="country-picker-section" ref={searchContainerRef} aria-label="添加对比国家">
           <div className="section-label">
             <Plus size={16} weight="bold" />
@@ -780,7 +794,7 @@ function App() {
           )}
         </section>
 
-        {/* 高级显示设置 (折叠手风琴设计) */}
+        {/* 高级显示设置 (折叠手风琴) */}
         <section className="advanced-settings-section" aria-label="显示控制">
           <button
             type="button"
@@ -850,11 +864,25 @@ function App() {
         </div>
 
         <p className="note">
-          国家真实面积不变。视觉形变来自 Web Mercator 投影各向同性拉伸。将国家往赤道拖动，在经度和纬度两个方向会以相同比例收缩至真实物理大小。
+          国家真实面积不变。基于大圆航线球面平移，将国家往赤道拖动，经纬度方向会以相同比例收缩，无形变畸变。
         </p>
       </aside>
 
+      {/* 地图舞台区域 */}
       <section className="map-stage" aria-label="可拖动地图">
+        {/* 浮动面板隐藏时的展开面板按钮 */}
+        {isPanelCollapsed && (
+          <button
+            type="button"
+            className="panel-toggle-btn-floating"
+            onClick={() => setIsPanelCollapsed(false)}
+            title="展开控制面板"
+          >
+            <CaretRight size={16} weight="bold" />
+            展开控制台
+          </button>
+        )}
+
         <div ref={mapNodeRef} className="map-canvas" />
         
         {/* Floating map controls on the map stage itself */}
