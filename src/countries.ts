@@ -79,6 +79,9 @@ const COUNTRY_LABELS = new Map<string, string>([
   ['Ecuador', '厄瓜多尔'],
   ['Iceland', '冰岛'],
   ['Cuba', '古巴'],
+  ['Antarctica', '南极洲'],
+  ['Western Europe', '西欧'],
+  ['Africa', '非洲'],
 ])
 
 const countryObjects = atlas.objects.countries as unknown as {
@@ -124,10 +127,10 @@ if (chinaFeature && taiwanFeature) {
 
 export const WORLD_COUNTRY_COLLECTION = worldFeatures as FeatureCollection
 
-export const COUNTRIES: CountryRecord[] = worldFeatures.features
+const baseCountries: CountryRecord[] = worldFeatures.features
   .filter((item) => {
     const name = String(item.properties?.name || '')
-    return name && name !== 'Antarctica' && name !== 'undefined'
+    return name && name !== 'undefined'
   })
   .map((item) => {
     const typedFeature = item as CountryFeature
@@ -145,6 +148,64 @@ export const COUNTRIES: CountryRecord[] = worldFeatures.features
   .filter((country) => {
     return country.center && !isNaN(country.center[0]) && !isNaN(country.center[1])
   })
+
+const WEST_EUROPE_COUNTRIES = [
+  'France', 'Germany', 'Spain', 'Italy', 'United Kingdom', 'Belgium', 'Netherlands', 'Switzerland', 'Austria', 'Portugal', 'Ireland', 'Luxembourg'
+]
+
+const AFRICA_COUNTRIES = [
+  'Algeria', 'Angola', 'Benin', 'Botswana', 'Burkina Faso', 'Burundi', 'Cameroon', 'Central African Rep.',
+  'Chad', 'Congo', "Côte d'Ivoire", 'Dem. Rep. Congo', 'Djibouti', 'Egypt', 'Eq. Guinea', 'Eritrea',
+  'Ethiopia', 'Gabon', 'Gambia', 'Ghana', 'Guinea', 'Guinea-Bissau', 'Kenya', 'Lesotho', 'Liberia',
+  'Libya', 'Madagascar', 'Malawi', 'Mali', 'Mauritania', 'Morocco', 'Mozambique', 'Namibia', 'Niger',
+  'Nigeria', 'Rwanda', 'Senegal', 'Sierra Leone', 'Somalia', 'South Africa', 'S. Sudan', 'Sudan',
+  'eSwatini', 'Tanzania', 'Togo', 'Tunisia', 'Uganda', 'W. Sahara', 'Zambia', 'Zimbabwe', 'Somaliland'
+]
+
+function buildVirtualRegion(regionName: string, countryNames: string[]): CountryRecord | null {
+  const matchingRecords = baseCountries.filter(c => countryNames.includes(c.sourceName))
+  if (matchingRecords.length === 0) return null
+
+  const polygons: any[] = []
+  matchingRecords.forEach(r => {
+    const f = r.feature
+    if (f.geometry.type === 'Polygon') {
+      polygons.push(f.geometry.coordinates)
+    } else if (f.geometry.type === 'MultiPolygon') {
+      polygons.push(...f.geometry.coordinates)
+    }
+  })
+
+  const mergedFeature: CountryFeature = {
+    type: 'Feature',
+    properties: { name: regionName },
+    geometry: {
+      type: 'MultiPolygon',
+      coordinates: polygons
+    }
+  }
+
+  const id = regionName.toLowerCase().replaceAll(/\W+/g, '-')
+  const nameZh = COUNTRY_LABELS.get(regionName) ?? regionName
+
+  return {
+    id,
+    sourceName: regionName,
+    nameZh,
+    feature: mergedFeature,
+    center: getFeatureCenter(mergedFeature),
+    areaKm2: matchingRecords.reduce((sum, r) => sum + r.areaKm2, 0)
+  }
+}
+
+const westEuropeRegion = buildVirtualRegion('Western Europe', WEST_EUROPE_COUNTRIES)
+const africaRegion = buildVirtualRegion('Africa', AFRICA_COUNTRIES)
+
+const combinedCountries = [...baseCountries]
+if (westEuropeRegion) combinedCountries.push(westEuropeRegion)
+if (africaRegion) combinedCountries.push(africaRegion)
+
+export const COUNTRIES: CountryRecord[] = combinedCountries
   .sort((a, b) => a.nameZh.localeCompare(b.nameZh, 'zh-CN'))
 
 export const DEFAULT_COUNTRY_ID =

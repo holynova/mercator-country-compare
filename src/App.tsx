@@ -298,20 +298,20 @@ function App() {
       // Curated list of major countries
       const majorCountries = [
         'China',
-        'Russia',
         'United States of America',
+        'Russia',
+        'Greenland',
         'Canada',
+        'Western Europe',
+        'Africa',
+        'Antarctica',
         'Brazil',
         'Australia',
         'India',
-        'Greenland',
-        'United Kingdom',
         'Japan',
+        'United Kingdom',
         'France',
         'Germany',
-        'South Africa',
-        'Egypt',
-        'Indonesia',
       ]
       return COUNTRIES.filter((c) => majorCountries.includes(c.sourceName))
     }
