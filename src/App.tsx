@@ -86,8 +86,10 @@ interface ActiveCountry {
 }
 
 interface Preset {
-  name: string
-  description: string
+  nameZh: string
+  nameEn: string
+  descZh: string
+  descEn: string
   countries: Array<{
     countryName: string
     customCenter?: [number, number]
@@ -96,8 +98,10 @@ interface Preset {
 
 const PRESETS: Preset[] = [
   {
-    name: '赤道大缩小 (Equator Shrink)',
-    description: '将高纬度大国（格陵兰、俄罗斯、加拿大）拖到赤道，看看它们的真实大小。',
+    nameZh: '赤道大缩小 (Equator Shrink)',
+    nameEn: 'Equator Shrink',
+    descZh: '将高纬度大国（格陵兰、俄罗斯、加拿大）拖到赤道，看看它们的真实大小。',
+    descEn: 'Drag high-latitude landmasses (Greenland, Russia, Canada) to the equator to see their true sizes.',
     countries: [
       { countryName: 'Greenland', customCenter: [-40, 0] },
       { countryName: 'Russia', customCenter: [20, 0] },
@@ -105,16 +109,20 @@ const PRESETS: Preset[] = [
     ],
   },
   {
-    name: '中美横向对比 (China vs. USA)',
-    description: '将美国平移到中国所在的纬度并排对比，观察两者真实的版图比例大小。',
+    nameZh: '中美横向对比 (China vs. USA)',
+    nameEn: 'China vs. USA',
+    descZh: '将美国平移到中国所在的纬度并排对比，观察两者真实的版图比例大小。',
+    descEn: 'Translate the USA to China\'s latitude for side-by-side comparison, observing their true proportions.',
     countries: [
       { countryName: 'China' },
       { countryName: 'United States of America', customCenter: [60, 36.6] },
     ],
   },
   {
-    name: '非洲有多大 (True Size of Africa)',
-    description: '将中国、美国、英国、法国、德国等并排放入非洲，感受非洲大陆极其辽阔的真实面积。',
+    nameZh: '非洲有多大 (True Size of Africa)',
+    nameEn: 'True Size of Africa',
+    descZh: '将中国、美国、英国、法国、德国等并排放入非洲，感受非洲大陆极其辽阔的真实面积。',
+    descEn: 'Place China, USA, UK, France, Germany, etc. side-by-side into Africa to grasp the immense scale of the African continent.',
     countries: [
       { countryName: 'China', customCenter: [26, -3] },
       { countryName: 'United States of America', customCenter: [13, -15] },
@@ -125,8 +133,10 @@ const PRESETS: Preset[] = [
     ],
   },
   {
-    name: '格陵兰有多大 (Size of Greenland)',
-    description: '将格陵兰、中国、美国、巴西放在赤道并排对比，观察格陵兰真实的版图大小。',
+    nameZh: '格陵兰有多大 (Size of Greenland)',
+    nameEn: 'Size of Greenland',
+    descZh: '将格陵兰、中国、美国、巴西放在赤道并排对比，观察格陵兰真实的版图大小。',
+    descEn: 'Compare Greenland, China, USA, and Brazil side-by-side at the equator to reveal Greenland\'s true proportions.',
     countries: [
       { countryName: 'Greenland', customCenter: [-15, 0] },
       { countryName: 'China', customCenter: [10, 0] },
@@ -135,8 +145,10 @@ const PRESETS: Preset[] = [
     ],
   },
   {
-    name: '南极有多大 (Size of Antarctica)',
-    description: '将南极洲、俄罗斯、中国、非洲在赤道并排对比，揭示南极洲真实的陆地占比。',
+    nameZh: '南极有多大 (Size of Antarctica)',
+    nameEn: 'Size of Antarctica',
+    descZh: '将南极洲、俄罗斯、中国、非洲在赤道并排对比，揭示南极洲真实的陆地占比。',
+    descEn: 'Compare Antarctica, Russia, China, and Africa side-by-side at the equator to reveal Antarctica\'s true relative area.',
     countries: [
       { countryName: 'Antarctica', customCenter: [-10, 0] },
       { countryName: 'Russia', customCenter: [25, 0] },
@@ -145,8 +157,10 @@ const PRESETS: Preset[] = [
     ],
   },
   {
-    name: '全球六大领土国 (Six Giants)',
-    description: '展示世界领土前六大国家在它们原产地的位置及实际投影比例。',
+    nameZh: '全球六大领土国 (Six Giants)',
+    nameEn: 'Six Giants',
+    descZh: '展示世界领土前六大国家在它们原产地的位置及实际投影比例。',
+    descEn: 'Showcase the top six largest countries in their original positions and actual Mercator projections.',
     countries: [
       { countryName: 'Russia' },
       { countryName: 'Canada' },
@@ -157,6 +171,71 @@ const PRESETS: Preset[] = [
     ],
   },
 ]
+
+const t = {
+  zh: {
+    title: '地图投影形变实验室',
+    searchPlaceholder: '中/英文搜索世界国家...',
+    searchResults: '搜索结果',
+    continentsRegions: '大洲与区域',
+    recommendedCountries: '推荐国家',
+    noResults: '未找到匹配的国家',
+    compareBoardTitle: '对比管理看板',
+    emptyBoard: '暂无对比国家。请在上方选择或搜索添加',
+    clearBoard: '清空对比看板',
+    locate: '定位',
+    reset: '重置',
+    delete: '删除',
+    advancedSettings: '高级显示设置',
+    outlineOpacity: '轮廓不透明度',
+    hideOutline: '隐藏描边',
+    showOutline: '显示描边',
+    hideGrid: '隐藏参考线',
+    showGrid: '显示参考线',
+    resetAll: '全部归位',
+    presetTitle: '经典对比场景预设',
+    note: '国家真实面积不变。基于大圆航线球面平移，将国家往赤道拖动，经纬度方向会以相同比例收缩，无形变畸变。',
+    maxLimit: '添加对比国家 (最多8个)',
+    hidePanel: '隐藏控制台',
+    showPanel: '展开控制台',
+    mapStyle: '地图样式',
+    styleColor: '彩色',
+    styleDark: '暗黑',
+    styleLight: '明亮',
+    styleOffline: '离线',
+  },
+  en: {
+    title: 'Mercator Lab',
+    searchPlaceholder: 'Search countries or continents...',
+    searchResults: 'Search Results',
+    continentsRegions: 'Continents & Regions',
+    recommendedCountries: 'Recommended Countries',
+    noResults: 'No matching countries found',
+    compareBoardTitle: 'Compare Control Board',
+    emptyBoard: 'No countries added. Search or select above to add.',
+    clearBoard: 'Clear Compare Board',
+    locate: 'Locate',
+    reset: 'Reset',
+    delete: 'Delete',
+    advancedSettings: 'Advanced Display Settings',
+    outlineOpacity: 'Outline Opacity',
+    hideOutline: 'Hide Outline',
+    showOutline: 'Show Outline',
+    hideGrid: 'Hide Grid Lines',
+    showGrid: 'Show Grid Lines',
+    resetAll: 'Reset All Positions',
+    presetTitle: 'Scenario Presets',
+    note: 'True country sizes remain unchanged. Based on great-circle spherical translation, moving countries towards the equator shrinks them isotropically along both latitude and longitude lines, preserving shape without distortion.',
+    maxLimit: 'Add Countries (Max 8)',
+    hidePanel: 'Hide Panel',
+    showPanel: 'Show Panel',
+    mapStyle: 'Map Style',
+    styleColor: 'Color',
+    styleDark: 'Dark',
+    styleLight: 'Light',
+    styleOffline: 'Offline',
+  }
+}
 
 function projectCountryPath(
   map: maplibregl.Map,
@@ -306,6 +385,15 @@ function App() {
   const [showAdvancedSettings, setShowAdvancedSettings] = useState(false)
   const [isPanelCollapsed, setIsPanelCollapsed] = useState(false)
   const [mapRenderTick, setMapRenderTick] = useState(0)
+  const [lang, setLang] = useState<'zh' | 'en'>(() => {
+    const saved = localStorage.getItem('app-lang')
+    return (saved === 'zh' || saved === 'en') ? saved : 'zh'
+  })
+
+  // Sync lang state to localStorage
+  useEffect(() => {
+    localStorage.setItem('app-lang', lang)
+  }, [lang])
 
   // Track style in ref to use in events
   useEffect(() => {
@@ -621,15 +709,15 @@ function App() {
 
     const map = mapRef.current
     if (map) {
-      if (preset.name.includes('中美')) {
+      if (preset.nameZh.includes('中美')) {
         map.flyTo({ center: [80, 32], zoom: 2.3, duration: 800 })
-      } else if (preset.name.includes('赤道')) {
+      } else if (preset.nameZh.includes('赤道')) {
         map.flyTo({ center: [-10, 15], zoom: 1.8, duration: 800 })
-      } else if (preset.name.includes('非洲')) {
+      } else if (preset.nameZh.includes('非洲')) {
         map.flyTo({ center: [20, 0], zoom: 2.1, duration: 800 })
-      } else if (preset.name.includes('格陵兰')) {
+      } else if (preset.nameZh.includes('格陵兰')) {
         map.flyTo({ center: [-15, -2], zoom: 1.9, duration: 800 })
-      } else if (preset.name.includes('南极')) {
+      } else if (preset.nameZh.includes('南极')) {
         map.flyTo({ center: [0, 0], zoom: 1.8, duration: 800 })
       } else {
         map.flyTo({ center: [10, 10], zoom: 1.6, duration: 800 })
@@ -703,32 +791,43 @@ function App() {
         </button>
 
         <div className="brand-block">
-          <p className="eyebrow">Mercator Projection Lab</p>
-          <h1>地图投影形变实验室</h1>
-          <a
-            href="https://github.com/holynova/mercator-country-compare"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="github-repo-link"
-          >
-            <GithubLogo size={12} weight="bold" />
-            GitHub Repository
-          </a>
+          <p className="eyebrow">Mercator Lab</p>
+          <h1>{t[lang].title}</h1>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginTop: '6px' }}>
+            <a
+              href="https://github.com/holynova/mercator-country-compare"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="github-repo-link"
+            >
+              <GithubLogo size={12} weight="bold" />
+              GitHub Repository
+            </a>
+            <button
+              type="button"
+              className="lang-toggle-btn"
+              onClick={() => setLang(lang === 'zh' ? 'en' : 'zh')}
+              title={lang === 'zh' ? 'Switch to English' : '切换至中文'}
+            >
+              {lang === 'zh' ? 'EN' : '中文'}
+            </button>
+          </div>
         </div>
 
         {/* 预设演示区域 */}
         <section className="presets-section" aria-label="经典演示预设">
-          <div className="section-label">经典对比场景预设</div>
+          <div className="section-label">{t[lang].presetTitle}</div>
           <div className="presets-pills">
             {PRESETS.map((preset, index) => {
-              const shortName = preset.name.split(' (')[0] ?? preset.name
+              const name = lang === 'zh' ? preset.nameZh : preset.nameEn
+              const shortName = name.split(' (')[0] ?? name
               return (
                 <button
                   key={index}
                   type="button"
                   className="preset-pill-btn"
                   onClick={() => loadPreset(preset)}
-                  title={preset.description}
+                  title={lang === 'zh' ? preset.descZh : preset.descEn}
                 >
                   {shortName}
                 </button>
@@ -739,11 +838,11 @@ function App() {
 
         {/* 国家搜索与选择器 (内嵌平铺式设计，默认显示热门国家且支持即时搜索) */}
         <section className="country-picker-section" aria-label="添加对比国家">
-          <div className="section-label">添加对比国家 (最多8个)</div>
+          <div className="section-label">{t[lang].maxLimit}</div>
           <div className="search-box">
             <input
               type="text"
-              placeholder="中/英文搜索世界国家..."
+              placeholder={t[lang].searchPlaceholder}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="search-input"
@@ -762,7 +861,7 @@ function App() {
           <div className="country-grid-inline">
             {searchQuery ? (
               <>
-                <div className="dropdown-title">搜索结果</div>
+                <div className="dropdown-title">{t[lang].searchResults}</div>
                 <div className="dropdown-grid">
                   {filteredCountries.slice(0, 15).map((country) => {
                     const isActive = activeCountries.some((item) => item.countryId === country.id)
@@ -773,18 +872,18 @@ function App() {
                         className={`country-dropdown-btn ${isActive ? 'active' : ''}`}
                         onClick={() => addCountry(country.id)}
                       >
-                        {country.nameZh}
+                        {lang === 'zh' ? country.nameZh : country.sourceName}
                       </button>
                     )
                   })}
                 </div>
                 {filteredCountries.length === 0 && (
-                  <p className="no-results-dropdown">未找到匹配的国家</p>
+                  <p className="no-results-dropdown">{t[lang].noResults}</p>
                 )}
               </>
             ) : (
               <>
-                <div className="dropdown-title">大洲与区域</div>
+                <div className="dropdown-title">{t[lang].continentsRegions}</div>
                 <div className="dropdown-grid">
                   {regionsList.map((country) => {
                     const isActive = activeCountries.some((item) => item.countryId === country.id)
@@ -795,13 +894,13 @@ function App() {
                         className={`country-dropdown-btn ${isActive ? 'active' : ''}`}
                         onClick={() => addCountry(country.id)}
                       >
-                        {country.nameZh}
+                        {lang === 'zh' ? country.nameZh : country.sourceName}
                       </button>
                     )
                   })}
                 </div>
 
-                <div className="dropdown-title" style={{ marginTop: '8px' }}>推荐国家</div>
+                <div className="dropdown-title" style={{ marginTop: '8px' }}>{t[lang].recommendedCountries}</div>
                 <div className="dropdown-grid">
                   {recommendedCountriesList.map((country) => {
                     const isActive = activeCountries.some((item) => item.countryId === country.id)
@@ -812,7 +911,7 @@ function App() {
                         className={`country-dropdown-btn ${isActive ? 'active' : ''}`}
                         onClick={() => addCountry(country.id)}
                       >
-                        {country.nameZh}
+                        {lang === 'zh' ? country.nameZh : country.sourceName}
                       </button>
                     )
                   })}
@@ -824,7 +923,7 @@ function App() {
 
         {/* 对比看板 */}
         <section className="compare-board-section" aria-label="对比看板">
-          <div className="section-label">对比管理看板</div>
+          <div className="section-label">{t[lang].compareBoardTitle}</div>
           {activeCountries.length > 0 ? (
             <div className="compare-list">
               {activeCountries.map((item) => {
@@ -840,13 +939,13 @@ function App() {
                           className="color-dot"
                           style={{ backgroundColor: item.color }}
                         />
-                        {item.nameZh}
+                        {lang === 'zh' ? item.nameZh : item.sourceName}
                       </span>
                       <div className="item-actions">
                         <button
                           type="button"
                           className="action-btn"
-                          title="定位"
+                          title={t[lang].locate}
                           onClick={() => zoomToCountry(item.instanceId)}
                         >
                           <MapPin size={14} weight="fill" />
@@ -854,7 +953,7 @@ function App() {
                         <button
                           type="button"
                           className="action-btn"
-                          title="重置"
+                          title={t[lang].reset}
                           onClick={() => resetCountryCenter(item.instanceId)}
                         >
                           <ArrowsClockwise size={14} weight="bold" />
@@ -862,7 +961,7 @@ function App() {
                         <button
                           type="button"
                           className="action-btn delete-btn"
-                          title="删除"
+                          title={t[lang].delete}
                           onClick={() => removeCountry(item.instanceId)}
                         >
                           <Trash size={14} weight="bold" />
@@ -875,7 +974,7 @@ function App() {
             </div>
           ) : (
             <div className="empty-state">
-              <p>暂无对比国家。请在上方选择或搜索添加</p>
+              <p>{t[lang].emptyBoard}</p>
             </div>
           )}
         </section>
@@ -890,7 +989,7 @@ function App() {
           >
             <span>
               <Info size={16} weight="bold" />
-              高级显示设置
+              {t[lang].advancedSettings}
             </span>
             <span className={`chevron ${showAdvancedSettings ? 'open' : ''}`}>▼</span>
           </button>
@@ -900,7 +999,7 @@ function App() {
               <label className="range-field">
                 <span>
                   <Eye size={16} weight="bold" />
-                  轮廓不透明度
+                  {t[lang].outlineOpacity}
                 </span>
                 <output>{Math.round(opacity * 100)}%</output>
                 <input
@@ -920,7 +1019,7 @@ function App() {
                   onClick={() => setShowOutline((value) => !value)}
                 >
                   {showOutline ? <Eye size={16} weight="bold" /> : <EyeSlash size={16} weight="bold" />}
-                  {showOutline ? '隐藏描边' : '显示描边'}
+                  {showOutline ? t[lang].hideOutline : t[lang].showOutline}
                 </button>
 
                 <button
@@ -930,7 +1029,7 @@ function App() {
                   onClick={() => setShowGraticule((value) => !value)}
                 >
                   {showGraticule ? <Eye size={16} weight="bold" /> : <EyeSlash size={16} weight="bold" />}
-                  {showGraticule ? '隐藏参考线' : '显示参考线'}
+                  {showGraticule ? t[lang].hideGrid : t[lang].showGrid}
                 </button>
 
                 <button
@@ -940,7 +1039,7 @@ function App() {
                   disabled={activeCountries.length === 0}
                 >
                   <ArrowsClockwise size={16} weight="bold" />
-                  全部归位
+                  {t[lang].resetAll}
                 </button>
               </div>
             </div>
@@ -955,12 +1054,12 @@ function App() {
             disabled={activeCountries.length === 0}
           >
             <Trash size={16} weight="bold" />
-            清空对比看板
+            {t[lang].clearBoard}
           </button>
         </div>
 
         <p className="note">
-          国家真实面积不变。基于大圆航线球面平移，将国家往赤道拖动，经纬度方向会以相同比例收缩，无形变畸变。
+          {t[lang].note}
         </p>
       </aside>
 
@@ -972,10 +1071,10 @@ function App() {
             type="button"
             className="panel-toggle-btn-floating"
             onClick={() => setIsPanelCollapsed(false)}
-            title="展开控制面板"
+            title={t[lang].showPanel}
           >
             <CaretLeft size={16} weight="bold" />
-            展开控制台
+            {t[lang].showPanel}
           </button>
         )}
 
@@ -993,10 +1092,10 @@ function App() {
                   className={`style-btn-mini ${mapStyle === style ? 'active' : ''}`}
                   onClick={() => setMapStyle(style)}
                 >
-                  {style === 'dark' && '暗黑'}
-                  {style === 'light' && '明亮'}
-                  {style === 'voyager' && '彩色'}
-                  {style === 'minimal' && '离线'}
+                  {style === 'dark' && t[lang].styleDark}
+                  {style === 'light' && t[lang].styleLight}
+                  {style === 'voyager' && t[lang].styleColor}
+                  {style === 'minimal' && t[lang].styleOffline}
                 </button>
               ))}
             </div>
@@ -1006,7 +1105,7 @@ function App() {
           <button
             type="button"
             className="floating-btn reset-view-floating"
-            title="复位地图视角"
+            title={lang === 'zh' ? '复位地图视角' : 'Reset Map View'}
             onClick={() => {
               mapRef.current?.flyTo({
                 center: INITIAL_CENTER,
@@ -1016,7 +1115,7 @@ function App() {
             }}
           >
             <Crosshair size={14} weight="bold" />
-            复位地图
+            {lang === 'zh' ? '复位地图' : 'Reset Map'}
           </button>
         </div>
 
@@ -1036,8 +1135,8 @@ function App() {
         </svg>
         <div className="map-hint" data-dragging={draggingInstanceId !== null}>
           {draggingInstanceId
-            ? '正在移动国家轮廓，观察其大小比例形变...'
-            : '拖动地图上的彩色国家轮廓，平移它们进行纬度形变对比'}
+            ? (lang === 'zh' ? '正在移动国家轮廓，观察其大小比例形变...' : 'Moving outline. Observe size deformation...')
+            : (lang === 'zh' ? '拖动地图上的彩色国家轮廓，平移它们进行纬度形变对比' : 'Drag country outlines to compare latitude projection deformation.')}
         </div>
       </section>
     </main>
