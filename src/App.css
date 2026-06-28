@@ -54,6 +54,7 @@ button, input, select, textarea {
 /* App Layout Shell (Flexbox based to support smooth folding of sidebar) */
 .app-shell {
   display: flex;
+  flex-direction: row-reverse; /* Put sidebar on the right! */
   min-height: 100dvh;
   overflow: hidden;
   position: relative;
@@ -68,18 +69,18 @@ button, input, select, textarea {
   padding: 24px;
   width: 380px;
   background: var(--bg-panel);
-  border-right: 1px solid var(--border-color);
+  border-left: 1px solid var(--border-color); /* Left border for right sidebar */
   box-shadow: var(--shadow-lg);
   overflow-y: auto;
   height: 100vh;
   flex-shrink: 0;
   position: relative;
-  transition: margin-left var(--transition), box-shadow var(--transition);
+  transition: margin-right var(--transition), box-shadow var(--transition);
 }
 
-/* Panel Collapsed State */
+/* Panel Collapsed State (Slides out to the right) */
 .panel.collapsed {
-  margin-left: -380px;
+  margin-right: -380px;
   box-shadow: none;
 }
 
@@ -102,7 +103,7 @@ button, input, select, textarea {
 .panel-toggle-btn-inside {
   position: absolute;
   top: 24px;
-  right: 16px;
+  left: 16px; /* Position on the left edge of right panel */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -126,7 +127,7 @@ button, input, select, textarea {
 .panel-toggle-btn-floating {
   position: absolute;
   top: 16px;
-  left: 16px;
+  right: 16px; /* Floating on the right edge of screen when collapsed */
   z-index: 30;
   display: flex;
   align-items: center;
@@ -148,7 +149,7 @@ button, input, select, textarea {
 }
 
 @keyframes floatIn {
-  from { opacity: 0; transform: translateX(-10px); }
+  from { opacity: 0; transform: translateX(10px); }
   to { opacity: 1; transform: translateX(0); }
 }
 
@@ -164,7 +165,7 @@ button, input, select, textarea {
   align-items: center;
   gap: 14px;
   padding-bottom: 4px;
-  padding-right: 28px; /* Give room for toggle button */
+  padding-left: 28px; /* Give room for toggle button on the left */
 }
 
 .brand-mark {
@@ -230,43 +231,37 @@ h1 {
   flex-direction: column;
 }
 
-.presets-list {
-  display: grid;
-  grid-template-columns: 1fr;
+.presets-pills {
+  display: flex;
+  flex-wrap: wrap;
   gap: 6px;
 }
 
-.preset-card {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  text-align: left;
-  padding: 8px 10px;
+.preset-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  font-size: 11px;
+  font-weight: 600;
   background: var(--bg-card);
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
+  border-radius: 16px;
+  color: var(--text-secondary);
   cursor: pointer;
   transition: var(--transition);
 }
 
-.preset-card:hover {
-  border-color: var(--border-color-active);
+.preset-pill-btn:hover {
   background: var(--bg-card-hover);
+  border-color: var(--border-color-active);
+  color: var(--text-primary);
   transform: translateY(-0.5px);
   box-shadow: var(--shadow-sm);
 }
 
-.preset-card strong {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: 2px;
-}
-
-.preset-card span {
-  font-size: 10px;
-  color: var(--text-muted);
-  line-height: 1.35;
+.preset-pill-icon {
+  color: var(--accent-color);
 }
 
 /* Country Picker & Search (Inline Combobox to avoid scrollbar clipping) */
@@ -315,24 +310,15 @@ h1 {
   height: 20px;
 }
 
-/* Combobox Inline suggestion dropdown */
-.search-dropdown-overlay {
-  margin-top: 6px;
-  background: #ffffff;
-  border: 1px solid var(--border-color-active);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-sm);
-  padding: 10px;
+/* Inline Country Grid Picker style */
+.country-grid-inline {
+  margin-top: 8px;
   display: flex;
   flex-direction: column;
   gap: 6px;
-  animation: dropdownSlideIn 0.18s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-@keyframes dropdownSlideIn {
-  from { opacity: 0; transform: translateY(-4px); }
-  to { opacity: 1; transform: translateY(0); }
-}
+
 
 .dropdown-title {
   font-size: 10px;
@@ -422,7 +408,7 @@ h1 {
 .compare-item {
   display: flex;
   flex-direction: column;
-  padding: 10px 12px;
+  padding: 6px 12px; /* compact single-line row padding */
   background: #ffffff;
   border: 1px solid var(--border-color);
   border-left-width: 4px;
@@ -737,7 +723,7 @@ h1 {
 .map-controls-floating {
   position: absolute;
   top: 16px;
-  right: 16px;
+  left: 16px;
   z-index: 20;
   display: flex;
   align-items: center;
@@ -918,9 +904,8 @@ h1 {
   }
 
   .panel.collapsed {
-    margin-left: 0;
+    margin-right: 0;
     transform: translateY(100%);
-    margin-top: -100%; /* For mobile vertical slide if needed, but standard is fine */
   }
   
   .compare-list {
@@ -930,7 +915,7 @@ h1 {
   .map-controls-floating {
     top: auto;
     bottom: 48px;
-    right: 16px;
+    left: 16px;
   }
   
   .panel-toggle-btn-inside, .panel-toggle-btn-floating {

@@ -33,9 +33,6 @@ import {
 } from './countries'
 import {
   clampLatitude,
-  formatArea,
-  formatCoordinate,
-  mercatorScale,
   moveCountryFeature,
   wrapLongitude,
   type CountryFeature,
@@ -117,6 +114,18 @@ const PRESETS: Preset[] = [
     countries: [
       { countryName: 'China' },
       { countryName: 'United States of America', customCenter: [60, 36.6] },
+    ],
+  },
+  {
+    name: '非洲有多大 (True Size of Africa)',
+    description: '将中国、美国、英国、法国、德国等并排放入非洲，感受非洲大陆极其辽阔的真实面积。',
+    countries: [
+      { countryName: 'China', customCenter: [26, -3] },
+      { countryName: 'United States of America', customCenter: [13, -15] },
+      { countryName: 'France', customCenter: [12, 18] },
+      { countryName: 'Germany', customCenter: [22, 20] },
+      { countryName: 'United Kingdom', customCenter: [31, 22] },
+      { countryName: 'Japan', customCenter: [26, -26] },
     ],
   },
   {
@@ -249,7 +258,6 @@ function App() {
   const mapRef = useRef<maplibregl.Map | null>(null)
   const dragCleanupRef = useRef<(() => void) | null>(null)
   const currentStyleRef = useRef<MapStyle>('dark')
-  const searchContainerRef = useRef<HTMLDivElement | null>(null)
 
   const [activeCountries, setActiveCountries] = useState<ActiveCountry[]>(() => {
     const defaultCountry = COUNTRIES.find((c) => c.sourceName === 'China') ?? COUNTRIES[0]
@@ -272,7 +280,6 @@ function App() {
   const [draggingInstanceId, setDraggingInstanceId] = useState<string | null>(null)
   const [mapStyle, setMapStyle] = useState<MapStyle>('dark')
   const [searchQuery, setSearchQuery] = useState('')
-  const [showSearchDropdown, setShowSearchDropdown] = useState(false)
   const [opacity, setOpacity] = useState(DEFAULT_OPACITY)
   const [showOutline, setShowOutline] = useState(DEFAULT_SHOW_OUTLINE)
   const [showAdvancedSettings, setShowAdvancedSettings] = useState(false)
@@ -283,17 +290,6 @@ function App() {
   useEffect(() => {
     currentStyleRef.current = mapStyle
   }, [mapStyle])
-
-  // Click outside to close search dropdown
-  useEffect(() => {
-    const handleOutsideClick = (e: MouseEvent) => {
-      if (searchContainerRef.current && !searchContainerRef.current.contains(e.target as Node)) {
-        setShowSearchDropdown(false)
-      }
-    }
-    document.addEventListener('mousedown', handleOutsideClick)
-    return () => document.removeEventListener('mousedown', handleOutsideClick)
-  }, [])
 
   // Memoize search/filter results
   const filteredCountries = useMemo(() => {
@@ -349,7 +345,7 @@ function App() {
         visualizePitch: false,
         showCompass: false,
       }),
-      'bottom-right',
+      'bottom-left',
     )
 
     const handleStyleLoad = () => {
@@ -538,6 +534,8 @@ function App() {
         map.flyTo({ center: [80, 32], zoom: 2.3, duration: 800 })
       } else if (preset.name.includes('赤道')) {
         map.flyTo({ center: [-10, 15], zoom: 1.8, duration: 800 })
+      } else if (preset.name.includes('非洲')) {
+        map.flyTo({ center: [20, 0], zoom: 2.1, duration: 800 })
       } else {
         map.flyTo({ center: [10, 10], zoom: 1.6, duration: 800 })
       }
@@ -606,7 +604,7 @@ function App() {
           onClick={() => setIsPanelCollapsed(true)}
           title="收起控制面板"
         >
-          <CaretLeft size={16} weight="bold" />
+          <CaretRight size={16} weight="bold" />
         </button>
 
         <div className="brand-block">
@@ -634,24 +632,27 @@ function App() {
             <Sparkle size={16} weight="bold" />
             经典对比场景预设
           </div>
-          <div className="presets-list">
-            {PRESETS.map((preset, index) => (
-              <button
-                key={index}
-                type="button"
-                className="preset-card"
-                onClick={() => loadPreset(preset)}
-                title={preset.description}
-              >
-                <strong>{preset.name}</strong>
-                <span>{preset.description}</span>
-              </button>
-            ))}
+          <div className="presets-pills">
+            {PRESETS.map((preset, index) => {
+              const shortName = preset.name.split(' (')[0] ?? preset.name
+              return (
+                <button
+                  key={index}
+                  type="button"
+                  className="preset-pill-btn"
+                  onClick={() => loadPreset(preset)}
+                  title={preset.description}
+                >
+                  <Sparkle size={12} weight="fill" className="preset-pill-icon" />
+                  {shortName}
+                </button>
+              )
+            })}
           </div>
         </section>
 
-        {/* 国家搜索与选择器 (Combobox 内置折叠设计，不溢出遮挡) */}
-        <section className="country-picker-section" ref={searchContainerRef} aria-label="添加对比国家">
+        {/* 国家搜索与选择器 (内嵌平铺式设计，默认显示热门国家且支持即时搜索) */}
+        <section className="country-picker-section" aria-label="添加对比国家">
           <div className="section-label">
             <Plus size={16} weight="bold" />
             添加对比国家 (最多8个)
@@ -661,57 +662,43 @@ function App() {
               type="text"
               placeholder="中/英文搜索世界国家..."
               value={searchQuery}
-              onFocus={() => setShowSearchDropdown(true)}
-              onChange={(e) => {
-                setSearchQuery(e.target.value)
-                setShowSearchDropdown(true)
-              }}
+              onChange={(e) => setSearchQuery(e.target.value)}
               className="search-input"
             />
             {searchQuery && (
               <button
                 type="button"
                 className="search-clear"
-                onClick={() => {
-                  setSearchQuery('')
-                  setShowSearchDropdown(true)
-                }}
+                onClick={() => setSearchQuery('')}
               >
                 ×
               </button>
             )}
           </div>
-          {showSearchDropdown && (
-            <div className="search-dropdown-overlay">
-              <div className="dropdown-title">
-                {searchQuery ? '搜索结果' : '热门推荐国家'}
-              </div>
-              <div className="dropdown-grid">
-                {filteredCountries.slice(0, 15).map((country) => {
-                  const isActive = activeCountries.some((item) => item.countryId === country.id)
-                  return (
-                    <button
-                      key={country.id}
-                      type="button"
-                      className={`country-dropdown-btn ${isActive ? 'active' : ''}`}
-                      onMouseDown={(e) => {
-                        e.preventDefault() // 防止 input 失去焦点
-                      }}
-                      onClick={() => {
-                        addCountry(country.id)
-                        setShowSearchDropdown(false)
-                      }}
-                    >
-                      {country.nameZh}
-                    </button>
-                  )
-                })}
-              </div>
-              {filteredCountries.length === 0 && (
-                <p className="no-results-dropdown">未找到匹配的国家</p>
-              )}
+          
+          <div className="country-grid-inline">
+            <div className="dropdown-title">
+              {searchQuery ? '搜索结果' : '热门推荐国家'}
             </div>
-          )}
+            <div className="dropdown-grid">
+              {filteredCountries.slice(0, 15).map((country) => {
+                const isActive = activeCountries.some((item) => item.countryId === country.id)
+                return (
+                  <button
+                    key={country.id}
+                    type="button"
+                    className={`country-dropdown-btn ${isActive ? 'active' : ''}`}
+                    onClick={() => addCountry(country.id)}
+                  >
+                    {country.nameZh}
+                  </button>
+                )
+              })}
+            </div>
+            {filteredCountries.length === 0 && (
+              <p className="no-results-dropdown">未找到匹配的国家</p>
+            )}
+          </div>
         </section>
 
         {/* 对比看板 */}
@@ -723,11 +710,6 @@ function App() {
           {activeCountries.length > 0 ? (
             <div className="compare-list">
               {activeCountries.map((item) => {
-                const origScale = mercatorScale(item.originalCenter[1])
-                const currScale = mercatorScale(item.currentCenter[1])
-                const dimensionRatio = currScale / origScale
-                const areaRatio = dimensionRatio ** 2
-
                 return (
                   <div
                     key={item.instanceId}
@@ -767,19 +749,6 @@ function App() {
                         >
                           <Trash size={14} weight="bold" />
                         </button>
-                      </div>
-                    </div>
-                    <div className="compare-item-stats">
-                      <div>
-                        真实面积：<strong>{formatArea(item.areaKm2)}</strong>
-                      </div>
-                      <div className="ratio-stat">
-                        尺寸放大：<strong>{dimensionRatio.toFixed(2)}x</strong>
-                        （面积放大：<strong>{areaRatio.toFixed(2)}x</strong>）
-                      </div>
-                      <div className="lat-stat-sub">
-                        纬度：{formatCoordinate(item.originalCenter[1], 'lat')} →{' '}
-                        {formatCoordinate(item.currentCenter[1], 'lat')}
                       </div>
                     </div>
                   </div>
@@ -878,7 +847,7 @@ function App() {
             onClick={() => setIsPanelCollapsed(false)}
             title="展开控制面板"
           >
-            <CaretRight size={16} weight="bold" />
+            <CaretLeft size={16} weight="bold" />
             展开控制台
           </button>
         )}
