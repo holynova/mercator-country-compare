@@ -9,13 +9,8 @@ import {
   Crosshair,
   Eye,
   EyeSlash,
-  GlobeHemisphereEast,
   MapPin,
-  Ruler,
-  SelectionSlash,
   Trash,
-  Plus,
-  Sparkle,
   Info,
   GithubLogo,
   CaretLeft,
@@ -148,7 +143,9 @@ function projectCountryPath(
 ) {
   const container = map.getContainer()
   const center = map.getCenter()
-  const scale = (512 * 2 ** map.getZoom()) / (2 * Math.PI)
+  const zoom = map.getZoom()
+  const worldWidth = 512 * Math.pow(2, zoom)
+  const scale = worldWidth / (2 * Math.PI)
   const projection = geoMercator()
     .scale(scale)
     .translate([container.clientWidth / 2, container.clientHeight / 2])
@@ -157,11 +154,13 @@ function projectCountryPath(
 
   return removeLongSvgSegments(
     geoPath(projection)(feature as GeoPermissibleObjects) ?? '',
+    worldWidth,
   )
 }
 
-function removeLongSvgSegments(pathData: string) {
-  const maxSegmentLength = 180
+function removeLongSvgSegments(pathData: string, worldWidth: number) {
+  // Only split segments that are wrap-around jumps (horizontal distance close to world width)
+  const wrapThreshold = worldWidth * 0.8
   const commands = pathData.match(/[ML][^MLZ]+|Z/g) ?? []
   let previous: [number, number] | null = null
 
@@ -185,10 +184,10 @@ function removeLongSvgSegments(pathData: string) {
         return `M${x},${y}`
       }
 
-      const distance = Math.hypot(x - previous[0], y - previous[1])
+      const dx = Math.abs(x - previous[0])
       previous = [x, y]
 
-      return `${distance > maxSegmentLength ? 'M' : 'L'}${x},${y}`
+      return `${dx > wrapThreshold ? 'M' : 'L'}${x},${y}`
     })
     .filter(Boolean)
     .join('')
@@ -608,30 +607,22 @@ function App() {
         </button>
 
         <div className="brand-block">
-          <div className="brand-mark">
-            <GlobeHemisphereEast size={24} weight="duotone" />
-          </div>
-          <div>
-            <p className="eyebrow">Mercator Projection Lab</p>
-            <h1>地图投影形变实验室</h1>
-            <a
-              href="https://github.com/holynova/mercator-country-compare"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="github-repo-link"
-            >
-              <GithubLogo size={12} weight="bold" />
-              GitHub Repository
-            </a>
-          </div>
+          <p className="eyebrow">Mercator Projection Lab</p>
+          <h1>地图投影形变实验室</h1>
+          <a
+            href="https://github.com/holynova/mercator-country-compare"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="github-repo-link"
+          >
+            <GithubLogo size={12} weight="bold" />
+            GitHub Repository
+          </a>
         </div>
 
         {/* 预设演示区域 */}
         <section className="presets-section" aria-label="经典演示预设">
-          <div className="section-label">
-            <Sparkle size={16} weight="bold" />
-            经典对比场景预设
-          </div>
+          <div className="section-label">经典对比场景预设</div>
           <div className="presets-pills">
             {PRESETS.map((preset, index) => {
               const shortName = preset.name.split(' (')[0] ?? preset.name
@@ -643,7 +634,6 @@ function App() {
                   onClick={() => loadPreset(preset)}
                   title={preset.description}
                 >
-                  <Sparkle size={12} weight="fill" className="preset-pill-icon" />
                   {shortName}
                 </button>
               )
@@ -653,10 +643,7 @@ function App() {
 
         {/* 国家搜索与选择器 (内嵌平铺式设计，默认显示热门国家且支持即时搜索) */}
         <section className="country-picker-section" aria-label="添加对比国家">
-          <div className="section-label">
-            <Plus size={16} weight="bold" />
-            添加对比国家 (最多8个)
-          </div>
+          <div className="section-label">添加对比国家 (最多8个)</div>
           <div className="search-box">
             <input
               type="text"
@@ -703,10 +690,7 @@ function App() {
 
         {/* 对比看板 */}
         <section className="compare-board-section" aria-label="对比看板">
-          <div className="section-label">
-            <Ruler size={16} weight="bold" />
-            对比管理看板
-          </div>
+          <div className="section-label">对比管理看板</div>
           {activeCountries.length > 0 ? (
             <div className="compare-list">
               {activeCountries.map((item) => {
@@ -757,8 +741,7 @@ function App() {
             </div>
           ) : (
             <div className="empty-state">
-              <SelectionSlash size={24} />
-              <p>暂无对比国家。请在上方选择或搜索国家添加到地图中。</p>
+              <p>暂无对比国家。请在上方选择或搜索添加</p>
             </div>
           )}
         </section>
@@ -827,7 +810,7 @@ function App() {
             onClick={clearAllCountries}
             disabled={activeCountries.length === 0}
           >
-            <SelectionSlash size={16} weight="bold" />
+            <Trash size={16} weight="bold" />
             清空对比看板
           </button>
         </div>
