@@ -744,10 +744,10 @@ h1 {
 }
 
 .floating-card {
-  padding: 6px 10px;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 4px;
+  padding: 0 6px;
+  height: 38px;
+  display: flex;
+  align-items: center;
 }
 
 .floating-title {
@@ -765,14 +765,18 @@ h1 {
 }
 
 .style-btn-mini {
-  padding: 4px 8px;
-  font-size: 10px;
+  height: 28px;
+  padding: 0 10px;
+  font-size: 11px;
   font-weight: 600;
   background: transparent;
   border: 1px solid transparent;
   border-radius: var(--radius-sm);
   color: var(--text-secondary);
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   transition: var(--transition);
 }
 

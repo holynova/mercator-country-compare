@@ -858,7 +858,6 @@ function App() {
         <div className="map-controls-floating">
           {/* Map style selector */}
           <div className="floating-card style-selector-floating">
-            <span className="floating-title">地图风格</span>
             <div className="style-buttons-mini">
               {(['dark', 'light', 'voyager', 'minimal'] as MapStyle[]).map((style) => (
                 <button
