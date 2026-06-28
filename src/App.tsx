@@ -1,6 +1,7 @@
 import {
   geoMercator,
   geoPath,
+  geoGraticule,
   type GeoProjection,
   type GeoPermissibleObjects,
 } from 'd3-geo'
@@ -276,7 +277,7 @@ function App() {
   const mapNodeRef = useRef<HTMLDivElement | null>(null)
   const mapRef = useRef<maplibregl.Map | null>(null)
   const dragCleanupRef = useRef<(() => void) | null>(null)
-  const currentStyleRef = useRef<MapStyle>('dark')
+  const currentStyleRef = useRef<MapStyle>('voyager')
 
   const [activeCountries, setActiveCountries] = useState<ActiveCountry[]>(() => {
     const defaultCountry = COUNTRIES.find((c) => c.sourceName === 'China') ?? COUNTRIES[0]
@@ -297,10 +298,11 @@ function App() {
   })
 
   const [draggingInstanceId, setDraggingInstanceId] = useState<string | null>(null)
-  const [mapStyle, setMapStyle] = useState<MapStyle>('dark')
+  const [mapStyle, setMapStyle] = useState<MapStyle>('voyager')
   const [searchQuery, setSearchQuery] = useState('')
   const [opacity, setOpacity] = useState(DEFAULT_OPACITY)
   const [showOutline, setShowOutline] = useState(DEFAULT_SHOW_OUTLINE)
+  const [showGraticule, setShowGraticule] = useState(true)
   const [showAdvancedSettings, setShowAdvancedSettings] = useState(false)
   const [isPanelCollapsed, setIsPanelCollapsed] = useState(false)
   const [mapRenderTick, setMapRenderTick] = useState(0)
@@ -309,6 +311,20 @@ function App() {
   useEffect(() => {
     currentStyleRef.current = mapStyle
   }, [mapStyle])
+
+  // Apply graticule lines visibility
+  useEffect(() => {
+    const map = mapRef.current
+    if (!map || !map.isStyleLoaded()) return
+
+    const visibility = showGraticule ? 'visible' : 'none'
+    if (map.getLayer('graticule-lines')) {
+      map.setLayoutProperty('graticule-lines', 'visibility', visibility)
+    }
+    if (map.getLayer('equator-line')) {
+      map.setLayoutProperty('equator-line', 'visibility', visibility)
+    }
+  }, [showGraticule, mapRenderTick])
 
   // Memoize search/filter results
   const regionsList = useMemo(() => {
@@ -406,6 +422,59 @@ function App() {
             },
           })
         }
+      }
+
+      // Add graticule and equator lines for visual reference
+      if (!map.getSource('graticule')) {
+        map.addSource('graticule', {
+          type: 'geojson',
+          data: geoGraticule()(),
+        })
+      }
+
+      if (!map.getSource('equator')) {
+        map.addSource('equator', {
+          type: 'geojson',
+          data: {
+            type: 'Feature',
+            geometry: {
+              type: 'LineString',
+              coordinates: [
+                [-180, 0],
+                [180, 0],
+              ],
+            },
+            properties: {},
+          },
+        })
+      }
+
+      if (!map.getLayer('graticule-lines')) {
+        map.addLayer({
+          id: 'graticule-lines',
+          type: 'line',
+          source: 'graticule',
+          paint: {
+            'line-color': '#64748b',
+            'line-opacity': 0.15,
+            'line-width': 0.6,
+            'line-dasharray': [4, 4],
+          },
+        })
+      }
+
+      if (!map.getLayer('equator-line')) {
+        map.addLayer({
+          id: 'equator-line',
+          type: 'line',
+          source: 'equator',
+          paint: {
+            'line-color': '#ea580c',
+            'line-opacity': 0.45,
+            'line-width': 1.2,
+            'line-dasharray': [6, 4],
+          },
+        })
       }
     }
 
@@ -852,6 +921,16 @@ function App() {
                 >
                   {showOutline ? <Eye size={16} weight="bold" /> : <EyeSlash size={16} weight="bold" />}
                   {showOutline ? '隐藏描边' : '显示描边'}
+                </button>
+
+                <button
+                  type="button"
+                  className="toggle-button"
+                  aria-pressed={showGraticule}
+                  onClick={() => setShowGraticule((value) => !value)}
+                >
+                  {showGraticule ? <Eye size={16} weight="bold" /> : <EyeSlash size={16} weight="bold" />}
+                  {showGraticule ? '隐藏参考线' : '显示参考线'}
                 </button>
 
                 <button

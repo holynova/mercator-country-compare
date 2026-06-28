@@ -604,6 +604,10 @@ h1 {
   cursor: not-allowed;
 }
 
+.toggle-button.reset-all-btn {
+  grid-column: 1 / -1;
+}
+
 /* Global Button Controls (Danger zone) */
 .button-grid-global {
   display: grid;
