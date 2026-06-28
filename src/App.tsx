@@ -124,6 +124,26 @@ const PRESETS: Preset[] = [
     ],
   },
   {
+    name: '格陵兰有多大 (Size of Greenland)',
+    description: '将格陵兰、中国、美国、巴西放在赤道并排对比，观察格陵兰真实的版图大小。',
+    countries: [
+      { countryName: 'Greenland', customCenter: [-15, 0] },
+      { countryName: 'China', customCenter: [10, 0] },
+      { countryName: 'United States of America', customCenter: [-35, 0] },
+      { countryName: 'Brazil', customCenter: [-55, -5] },
+    ],
+  },
+  {
+    name: '南极有多大 (Size of Antarctica)',
+    description: '将南极洲、俄罗斯、中国、非洲在赤道并排对比，揭示南极洲真实的陆地占比。',
+    countries: [
+      { countryName: 'Antarctica', customCenter: [-10, 0] },
+      { countryName: 'Russia', customCenter: [25, 0] },
+      { countryName: 'China', customCenter: [50, 0] },
+      { countryName: 'Africa', customCenter: [-50, 0] },
+    ],
+  },
+  {
     name: '全球六大领土国 (Six Giants)',
     description: '展示世界领土前六大国家在它们原产地的位置及实际投影比例。',
     countries: [
@@ -291,29 +311,32 @@ function App() {
   }, [mapStyle])
 
   // Memoize search/filter results
+  const regionsList = useMemo(() => {
+    const regionNames = ['Western Europe', 'Africa', 'Antarctica']
+    return COUNTRIES.filter((c) => regionNames.includes(c.sourceName))
+  }, [])
+
+  const recommendedCountriesList = useMemo(() => {
+    const countryNames = [
+      'China',
+      'United States of America',
+      'Russia',
+      'Greenland',
+      'Canada',
+      'Brazil',
+      'Australia',
+      'India',
+      'Japan',
+      'United Kingdom',
+      'France',
+      'Germany',
+    ]
+    return COUNTRIES.filter((c) => countryNames.includes(c.sourceName))
+  }, [])
+
   const filteredCountries = useMemo(() => {
     const query = searchQuery.toLowerCase().trim()
-    if (!query) {
-      // Curated list of major countries
-      const majorCountries = [
-        'China',
-        'United States of America',
-        'Russia',
-        'Greenland',
-        'Canada',
-        'Western Europe',
-        'Africa',
-        'Antarctica',
-        'Brazil',
-        'Australia',
-        'India',
-        'Japan',
-        'United Kingdom',
-        'France',
-        'Germany',
-      ]
-      return COUNTRIES.filter((c) => majorCountries.includes(c.sourceName))
-    }
+    if (!query) return []
     return COUNTRIES.filter(
       (c) =>
         c.nameZh.toLowerCase().includes(query) ||
@@ -535,6 +558,10 @@ function App() {
         map.flyTo({ center: [-10, 15], zoom: 1.8, duration: 800 })
       } else if (preset.name.includes('非洲')) {
         map.flyTo({ center: [20, 0], zoom: 2.1, duration: 800 })
+      } else if (preset.name.includes('格陵兰')) {
+        map.flyTo({ center: [-15, -2], zoom: 1.9, duration: 800 })
+      } else if (preset.name.includes('南极')) {
+        map.flyTo({ center: [0, 0], zoom: 1.8, duration: 800 })
       } else {
         map.flyTo({ center: [10, 10], zoom: 1.6, duration: 800 })
       }
@@ -664,26 +691,64 @@ function App() {
           </div>
           
           <div className="country-grid-inline">
-            <div className="dropdown-title">
-              {searchQuery ? '搜索结果' : '热门推荐国家'}
-            </div>
-            <div className="dropdown-grid">
-              {filteredCountries.slice(0, 15).map((country) => {
-                const isActive = activeCountries.some((item) => item.countryId === country.id)
-                return (
-                  <button
-                    key={country.id}
-                    type="button"
-                    className={`country-dropdown-btn ${isActive ? 'active' : ''}`}
-                    onClick={() => addCountry(country.id)}
-                  >
-                    {country.nameZh}
-                  </button>
-                )
-              })}
-            </div>
-            {filteredCountries.length === 0 && (
-              <p className="no-results-dropdown">未找到匹配的国家</p>
+            {searchQuery ? (
+              <>
+                <div className="dropdown-title">搜索结果</div>
+                <div className="dropdown-grid">
+                  {filteredCountries.slice(0, 15).map((country) => {
+                    const isActive = activeCountries.some((item) => item.countryId === country.id)
+                    return (
+                      <button
+                        key={country.id}
+                        type="button"
+                        className={`country-dropdown-btn ${isActive ? 'active' : ''}`}
+                        onClick={() => addCountry(country.id)}
+                      >
+                        {country.nameZh}
+                      </button>
+                    )
+                  })}
+                </div>
+                {filteredCountries.length === 0 && (
+                  <p className="no-results-dropdown">未找到匹配的国家</p>
+                )}
+              </>
+            ) : (
+              <>
+                <div className="dropdown-title">大洲与区域</div>
+                <div className="dropdown-grid">
+                  {regionsList.map((country) => {
+                    const isActive = activeCountries.some((item) => item.countryId === country.id)
+                    return (
+                      <button
+                        key={country.id}
+                        type="button"
+                        className={`country-dropdown-btn ${isActive ? 'active' : ''}`}
+                        onClick={() => addCountry(country.id)}
+                      >
+                        {country.nameZh}
+                      </button>
+                    )
+                  })}
+                </div>
+
+                <div className="dropdown-title" style={{ marginTop: '8px' }}>推荐国家</div>
+                <div className="dropdown-grid">
+                  {recommendedCountriesList.map((country) => {
+                    const isActive = activeCountries.some((item) => item.countryId === country.id)
+                    return (
+                      <button
+                        key={country.id}
+                        type="button"
+                        className={`country-dropdown-btn ${isActive ? 'active' : ''}`}
+                        onClick={() => addCountry(country.id)}
+                      >
+                        {country.nameZh}
+                      </button>
+                    )
+                  })}
+                </div>
+              </>
             )}
           </div>
         </section>
