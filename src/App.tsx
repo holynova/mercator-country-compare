@@ -389,11 +389,20 @@ function App() {
     const saved = localStorage.getItem('app-lang')
     return (saved === 'zh' || saved === 'en') ? saved : 'zh'
   })
+  const [mobilePanelState, setMobilePanelState] = useState<'collapsed' | 'half' | 'expanded'>('half')
 
   // Sync lang state to localStorage
   useEffect(() => {
     localStorage.setItem('app-lang', lang)
   }, [lang])
+
+  function cycleMobilePanelState() {
+    setMobilePanelState((current) => {
+      if (current === 'collapsed') return 'half'
+      if (current === 'half') return 'expanded'
+      return 'collapsed'
+    })
+  }
 
   // Track style in ref to use in events
   useEffect(() => {
@@ -753,6 +762,7 @@ function App() {
     event.currentTarget.setPointerCapture(event.pointerId)
     setDraggingInstanceId(instanceId)
     map.dragPan.disable()
+    map.touchZoomRotate.disable() // Lock map zoom/rotate gestures during dragging
     map.getCanvas().style.cursor = 'grabbing'
 
     const handleMove = (moveEvent: globalThis.PointerEvent) => {
@@ -762,6 +772,7 @@ function App() {
     const handleEnd = () => {
       setDraggingInstanceId(null)
       map.dragPan.enable()
+      map.touchZoomRotate.enable() // Restore map gestures
       map.getCanvas().style.cursor = 'grab'
       window.removeEventListener('pointermove', handleMove)
       window.removeEventListener('pointerup', handleEnd)
@@ -779,40 +790,54 @@ function App() {
   return (
     <main className="app-shell">
       {/* 收纳侧边栏面板 */}
-      <aside className={`panel ${isPanelCollapsed ? 'collapsed' : ''}`} aria-label="地图投影工具控制面板">
-        {/* 面板内折叠收起按钮 */}
-        <button
-          type="button"
-          className="panel-toggle-btn-inside"
-          onClick={() => setIsPanelCollapsed(true)}
-          title="收起控制面板"
-        >
-          <CaretRight size={16} weight="bold" />
-        </button>
+      <aside
+        className={`panel ${isPanelCollapsed ? 'collapsed' : ''} mobile-state-${mobilePanelState}`}
+        aria-label="地图投影工具控制面板"
+      >
+        {/* 移动端顶部手势拉手条 */}
+        <div className="mobile-pull-handle-bar" onClick={cycleMobilePanelState}>
+          <div className="mobile-pull-handle-line" />
+        </div>
 
-        <div className="brand-block">
-          <p className="eyebrow">Mercator Lab</p>
-          <h1>{t[lang].title}</h1>
-          <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginTop: '6px' }}>
-            <a
-              href="https://github.com/holynova/mercator-country-compare"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="github-repo-link"
-            >
-              <GithubLogo size={12} weight="bold" />
-              GitHub Repository
-            </a>
-            <button
-              type="button"
-              className="lang-toggle-btn"
-              onClick={() => setLang(lang === 'zh' ? 'en' : 'zh')}
-              title={lang === 'zh' ? 'Switch to English' : '切换至中文'}
-            >
-              {lang === 'zh' ? 'EN' : '中文'}
-            </button>
+        {/* 固定头部：包含品牌标识和切换 */}
+        <div className="panel-header-mobile">
+          {/* 面板内折叠收起按钮 */}
+          <button
+            type="button"
+            className="panel-toggle-btn-inside"
+            onClick={() => setIsPanelCollapsed(true)}
+            title="收起控制面板"
+          >
+            <CaretRight size={16} weight="bold" />
+          </button>
+
+          <div className="brand-block">
+            <p className="eyebrow">Mercator Lab</p>
+            <h1>{t[lang].title}</h1>
+            <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginTop: '6px' }}>
+              <a
+                href="https://github.com/holynova/mercator-country-compare"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="github-repo-link"
+              >
+                <GithubLogo size={12} weight="bold" />
+                GitHub Repository
+              </a>
+              <button
+                type="button"
+                className="lang-toggle-btn"
+                onClick={() => setLang(lang === 'zh' ? 'en' : 'zh')}
+                title={lang === 'zh' ? 'Switch to English' : '切换至中文'}
+              >
+                {lang === 'zh' ? 'EN' : '中文'}
+              </button>
+            </div>
           </div>
         </div>
+
+        {/* 滚动主体区 */}
+        <div className="panel-body-scrollable">
 
         {/* 预设演示区域 */}
         <section className="presets-section" aria-label="经典演示预设">
@@ -1061,6 +1086,7 @@ function App() {
         <p className="note">
           {t[lang].note}
         </p>
+        </div> {/* closing panel-body-scrollable */}
       </aside>
 
       {/* 地图舞台区域 */}
