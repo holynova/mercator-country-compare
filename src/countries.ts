@@ -91,6 +91,37 @@ const worldFeatures = feature(
   countryObjects as never,
 ) as unknown as FeatureCollection
 
+// 将台湾几何合并到中国
+const chinaFeature = worldFeatures.features.find(
+  (f) => f.properties?.name === 'China',
+) as CountryFeature | undefined
+
+const taiwanFeature = worldFeatures.features.find(
+  (f) => f.properties?.name === 'Taiwan',
+) as CountryFeature | undefined
+
+if (chinaFeature && taiwanFeature) {
+  const chinaPolygons =
+    chinaFeature.geometry.type === 'Polygon'
+      ? [chinaFeature.geometry.coordinates]
+      : chinaFeature.geometry.coordinates
+
+  const taiwanPolygons =
+    taiwanFeature.geometry.type === 'Polygon'
+      ? [taiwanFeature.geometry.coordinates]
+      : taiwanFeature.geometry.coordinates
+
+  chinaFeature.geometry = {
+    type: 'MultiPolygon',
+    coordinates: [...chinaPolygons, ...taiwanPolygons],
+  }
+
+  // 移除单独的台湾要素，使其仅作为中国的一部分被选择和渲染
+  worldFeatures.features = worldFeatures.features.filter(
+    (f) => f.properties?.name !== 'Taiwan',
+  )
+}
+
 export const WORLD_COUNTRY_COLLECTION = worldFeatures as FeatureCollection
 
 export const COUNTRIES: CountryRecord[] = worldFeatures.features
