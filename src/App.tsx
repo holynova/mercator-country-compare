@@ -31,6 +31,7 @@ import {
   clampLatitude,
   moveCountryFeature,
   wrapLongitude,
+  normalizeRing,
   type CountryFeature,
 } from './geo'
 
@@ -237,6 +238,39 @@ const t = {
   }
 }
 
+function normalizeFeatureCoordinates(
+  feature: ReturnType<typeof moveCountryFeature>,
+  referenceLng: number,
+): typeof feature {
+  const geometry = feature.geometry
+  if (geometry.type === 'Polygon') {
+    const coordinates = geometry.coordinates.map((ring) => {
+      return normalizeRing(ring, referenceLng)
+    })
+    return {
+      ...feature,
+      geometry: {
+        ...geometry,
+        coordinates,
+      },
+    }
+  } else if (geometry.type === 'MultiPolygon') {
+    const coordinates = geometry.coordinates.map((polygon) => {
+      return polygon.map((ring) => {
+        return normalizeRing(ring, referenceLng)
+      })
+    })
+    return {
+      ...feature,
+      geometry: {
+        ...geometry,
+        coordinates,
+      },
+    }
+  }
+  return feature
+}
+
 function projectCountryPath(
   map: maplibregl.Map,
   feature: ReturnType<typeof moveCountryFeature>,
@@ -246,6 +280,10 @@ function projectCountryPath(
   const zoom = map.getZoom()
   const worldWidth = 512 * Math.pow(2, zoom)
   const scale = worldWidth / (2 * Math.PI)
+  
+  // Normalize coordinates relative to the projection center longitude to prevent wrapping gaps
+  const normalizedFeature = normalizeFeatureCoordinates(feature, center.lng)
+
   const projection = geoMercator()
     .scale(scale)
     .translate([container.clientWidth / 2, container.clientHeight / 2])
@@ -253,7 +291,7 @@ function projectCountryPath(
     .clipAngle(180) as GeoProjection
 
   return removeLongSvgSegments(
-    geoPath(projection)(feature as GeoPermissibleObjects) ?? '',
+    geoPath(projection)(normalizedFeature as GeoPermissibleObjects) ?? '',
     worldWidth,
   )
 }

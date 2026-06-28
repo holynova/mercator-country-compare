@@ -138,7 +138,7 @@ function movePosition(
   return [dest[0], dest[1]]
 }
 
-function normalizeRing(ring: Position[], referenceLongitude: number) {
+export function normalizeRing(ring: Position[], referenceLongitude: number) {
   let previousLongitude = referenceLongitude
 
   return ring.map((position) => {
