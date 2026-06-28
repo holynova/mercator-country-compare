@@ -113,10 +113,10 @@ const PRESETS: Preset[] = [
   },
   {
     name: '中美横向对比 (China vs. USA)',
-    description: '将中国和美国平移到高纬度地区（如格陵兰岛旁），对比它们的版图大小。',
+    description: '将美国平移到中国所在的纬度并排对比，观察两者真实的版图比例大小。',
     countries: [
-      { countryName: 'China', customCenter: [-40, 72] },
-      { countryName: 'United States of America', customCenter: [-80, 72] },
+      { countryName: 'China' },
+      { countryName: 'United States of America', customCenter: [60, 36.6] },
     ],
   },
   {
@@ -535,7 +535,7 @@ function App() {
     const map = mapRef.current
     if (map) {
       if (preset.name.includes('中美')) {
-        map.flyTo({ center: [-60, 62], zoom: 2.1, duration: 800 })
+        map.flyTo({ center: [80, 32], zoom: 2.3, duration: 800 })
       } else if (preset.name.includes('赤道')) {
         map.flyTo({ center: [-10, 15], zoom: 1.8, duration: 800 })
       } else {
