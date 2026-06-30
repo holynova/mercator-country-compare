@@ -235,3 +235,38 @@ export function singleFeatureCollection(
     features: [feature],
   }
 }
+
+export function removeLongSvgSegments(pathData: string, worldWidth: number): string {
+  // Only split segments that are wrap-around jumps (horizontal distance close to world width)
+  const wrapThreshold = worldWidth * 0.8
+  const commands = pathData.match(/[ML][^MLZ]+|Z/g) ?? []
+  let previous: [number, number] | null = null
+
+  return commands
+    .map((command) => {
+      if (command === 'Z') {
+        previous = null
+        return 'Z'
+      }
+
+      const type = command[0]
+      const [x, y] = command
+        .slice(1)
+        .split(',')
+        .map((value) => Number(value)) as [number, number]
+
+      if (!Number.isFinite(x) || !Number.isFinite(y)) return ''
+
+      if (type === 'M' || !previous) {
+        previous = [x, y]
+        return `M${x},${y}`
+      }
+
+      const dx = Math.abs(x - previous[0])
+      previous = [x, y]
+
+      return `${dx > wrapThreshold ? 'M' : 'L'}${x},${y}`
+    })
+    .filter(Boolean)
+    .join('')
+}

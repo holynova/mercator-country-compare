@@ -32,6 +32,7 @@ import {
   moveCountryFeature,
   wrapLongitude,
   normalizeRing,
+  removeLongSvgSegments,
   type CountryFeature,
 } from './geo'
 
@@ -287,8 +288,7 @@ function projectCountryPath(
   const projection = geoMercator()
     .scale(scale)
     .translate([container.clientWidth / 2, container.clientHeight / 2])
-    .center([center.lng, center.lat])
-    .clipAngle(180) as GeoProjection
+    .center([center.lng, center.lat]) as GeoProjection
 
   return removeLongSvgSegments(
     geoPath(projection)(normalizedFeature as GeoPermissibleObjects) ?? '',
@@ -296,40 +296,7 @@ function projectCountryPath(
   )
 }
 
-function removeLongSvgSegments(pathData: string, worldWidth: number) {
-  // Only split segments that are wrap-around jumps (horizontal distance close to world width)
-  const wrapThreshold = worldWidth * 0.8
-  const commands = pathData.match(/[ML][^MLZ]+|Z/g) ?? []
-  let previous: [number, number] | null = null
 
-  return commands
-    .map((command) => {
-      if (command === 'Z') {
-        previous = null
-        return ''
-      }
-
-      const type = command[0]
-      const [x, y] = command
-        .slice(1)
-        .split(',')
-        .map((value) => Number(value)) as [number, number]
-
-      if (!Number.isFinite(x) || !Number.isFinite(y)) return ''
-
-      if (type === 'M' || !previous) {
-        previous = [x, y]
-        return `M${x},${y}`
-      }
-
-      const dx = Math.abs(x - previous[0])
-      previous = [x, y]
-
-      return `${dx > wrapThreshold ? 'M' : 'L'}${x},${y}`
-    })
-    .filter(Boolean)
-    .join('')
-}
 
 interface CountryOverlayPathProps {
   map: maplibregl.Map

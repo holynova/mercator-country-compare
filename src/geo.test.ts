@@ -7,6 +7,7 @@ import {
   moveCountryFeature,
   unwrapLongitudeNear,
   wrapLongitude,
+  removeLongSvgSegments,
   type CountryFeature,
 } from './geo'
 
@@ -77,5 +78,24 @@ describe('geo helpers', () => {
   it('reports much larger mercator scale near high latitude', () => {
     expect(mercatorScale(0)).toBeCloseTo(1, 4)
     expect(mercatorScale(70)).toBeGreaterThan(2.9)
+  })
+
+  describe('removeLongSvgSegments', () => {
+    it('preserves normal paths and closes with Z', () => {
+      const path = 'M10,20L30,40Z'
+      expect(removeLongSvgSegments(path, 1000)).toBe('M10,20L30,40Z')
+    })
+
+    it('splits segments crossing the wrap threshold', () => {
+      // worldWidth = 1000 -> wrapThreshold = 800
+      // segment from 10 to 850 exceeds threshold (dx = 840)
+      const path = 'M10,20L850,20'
+      expect(removeLongSvgSegments(path, 1000)).toBe('M10,20M850,20')
+    })
+
+    it('preserves Z in multi-polygon paths', () => {
+      const path = 'M10,20L30,40ZM50,60L70,80Z'
+      expect(removeLongSvgSegments(path, 1000)).toBe('M10,20L30,40ZM50,60L70,80Z')
+    })
   })
 })
