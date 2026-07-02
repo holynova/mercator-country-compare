@@ -16,8 +16,6 @@ import {
   GithubLogo,
   CaretLeft,
   CaretRight,
-  CaretUp,
-  CaretDown,
   MagnifyingGlass,
   X,
 } from '@phosphor-icons/react'
@@ -805,13 +803,6 @@ function App() {
       >
         {/* 移动端顶部手势拉手条 */}
         <div className="mobile-pull-handle-bar" onClick={cycleMobilePanelState}>
-          {mobilePanelState === 'collapsed' ? (
-            <CaretUp size={12} weight="bold" className="mobile-pull-caret" />
-          ) : mobilePanelState === 'half' ? (
-            <CaretUp size={12} weight="bold" className="mobile-pull-caret" />
-          ) : (
-            <CaretDown size={12} weight="bold" className="mobile-pull-caret" />
-          )}
           <div className="mobile-pull-handle-line" />
         </div>
 
