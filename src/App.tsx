@@ -18,6 +18,8 @@ import {
   CaretRight,
   MagnifyingGlass,
   X,
+  Plus,
+  Minus,
 } from '@phosphor-icons/react'
 import maplibregl, {
   type LngLatLike,
@@ -537,11 +539,10 @@ function App() {
     })
 
     map.addControl(
-      new maplibregl.NavigationControl({
-        visualizePitch: false,
-        showCompass: false,
+      new maplibregl.AttributionControl({
+        compact: true,
       }),
-      'bottom-left',
+      'bottom-right',
     )
 
     const handleStyleLoad = () => {
@@ -1247,23 +1248,28 @@ function App() {
         
         {/* Floating map controls on the map stage itself */}
         <div className="map-controls-floating">
-          {/* Map style selector */}
-          <div className="floating-card style-selector-floating">
-            <div className="style-buttons-mini">
-              {(['dark', 'light', 'voyager', 'minimal'] as MapStyle[]).map((style) => (
-                <button
-                  key={style}
-                  type="button"
-                  className={`style-btn-mini ${mapStyle === style ? 'active' : ''}`}
-                  onClick={() => setMapStyle(style)}
-                >
-                  {style === 'dark' && t[lang].styleDark}
-                  {style === 'light' && t[lang].styleLight}
-                  {style === 'voyager' && t[lang].styleColor}
-                  {style === 'minimal' && t[lang].styleOffline}
-                </button>
-              ))}
-            </div>
+          {/* Zoom controls */}
+          <div className="zoom-ctrl-group">
+            <button
+              type="button"
+              className="floating-btn zoom-in-btn"
+              title={lang === 'zh' ? '放大' : 'Zoom In'}
+              onClick={() => {
+                mapRef.current?.zoomIn({ duration: 300 })
+              }}
+            >
+              <Plus size={16} weight="bold" />
+            </button>
+            <button
+              type="button"
+              className="floating-btn zoom-out-btn"
+              title={lang === 'zh' ? '缩小' : 'Zoom Out'}
+              onClick={() => {
+                mapRef.current?.zoomOut({ duration: 300 })
+              }}
+            >
+              <Minus size={16} weight="bold" />
+            </button>
           </div>
 
           {/* Reset map view */}
@@ -1280,7 +1286,7 @@ function App() {
             }}
           >
             <Crosshair size={14} weight="bold" />
-            {lang === 'zh' ? '复位地图' : 'Reset Map'}
+            <span className="reset-view-btn-text">{lang === 'zh' ? '复位地图' : 'Reset Map'}</span>
           </button>
         </div>
 

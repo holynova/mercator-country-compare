@@ -874,6 +874,32 @@ h1 {
   right: 12px;
 }
 
+/* Unified Zoom Controls */
+.zoom-ctrl-group {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.zoom-ctrl-group .floating-btn {
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  width: 38px;
+  height: 38px;
+  padding: 0 !important;
+  justify-content: center;
+  align-items: center;
+}
+
+.zoom-ctrl-group .zoom-in-btn {
+  border-bottom: 1px solid var(--border-color) !important;
+}
+
 /* Responsive Styles */
 @media (max-width: 860px) {
   .app-shell {
@@ -1201,6 +1227,17 @@ h1 {
 
   .style-selector-floating {
     display: none !important;
+  }
+
+  .reset-view-btn-text {
+    display: none !important;
+  }
+
+  .reset-view-floating {
+    width: 38px !important;
+    height: 38px !important;
+    padding: 0 !important;
+    justify-content: center !important;
   }
   
   .panel-toggle-btn-inside, .panel-toggle-btn-floating {
