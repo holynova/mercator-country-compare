@@ -23,7 +23,7 @@ import maplibregl, {
   type LngLatLike,
 } from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
-import { useEffect, useMemo, useRef, useState, memo, type PointerEvent } from 'react'
+import { useEffect, useMemo, useRef, useState, memo, useCallback, type PointerEvent } from 'react'
 import './App.css'
 import {
   COUNTRIES,
@@ -359,6 +359,55 @@ const CountryOverlayPath = memo(({
   )
 })
 
+interface CountrySvgOverlayProps {
+  map: maplibregl.Map
+  activeCountries: ActiveCountry[]
+  opacity: number
+  showOutline: boolean
+  onDragStart: (event: PointerEvent<SVGPathElement>, instanceId: string) => void
+}
+
+const CountrySvgOverlay = memo(({
+  map,
+  activeCountries,
+  opacity,
+  showOutline,
+  onDragStart,
+}: CountrySvgOverlayProps) => {
+  const [renderTick, setRenderTick] = useState(0)
+
+  useEffect(() => {
+    const requestRender = () => {
+      setRenderTick((tick) => tick + 1)
+    }
+    map.on('move', requestRender)
+    map.on('zoom', requestRender)
+    map.on('resize', requestRender)
+
+    return () => {
+      map.off('move', requestRender)
+      map.off('zoom', requestRender)
+      map.off('resize', requestRender)
+    }
+  }, [map])
+
+  return (
+    <svg className="country-overlay" aria-hidden="true">
+      {activeCountries.map((item) => (
+        <CountryOverlayPath
+          key={item.instanceId}
+          map={map}
+          country={item}
+          opacity={opacity}
+          showOutline={showOutline}
+          onDragStart={onDragStart}
+          mapRenderTick={renderTick}
+        />
+      ))}
+    </svg>
+  )
+})
+
 function App() {
   const mapNodeRef = useRef<HTMLDivElement | null>(null)
   const mapRef = useRef<maplibregl.Map | null>(null)
@@ -391,12 +440,17 @@ function App() {
   const [showGraticule, setShowGraticule] = useState(true)
   const [showAdvancedSettings, setShowAdvancedSettings] = useState(false)
   const [isPanelCollapsed, setIsPanelCollapsed] = useState(false)
-  const [mapRenderTick, setMapRenderTick] = useState(0)
+  const [isMapLoaded, setIsMapLoaded] = useState(false)
   const [lang, setLang] = useState<'zh' | 'en'>(() => {
     const saved = localStorage.getItem('app-lang')
     return (saved === 'zh' || saved === 'en') ? saved : 'zh'
   })
   const [mobilePanelState, setMobilePanelState] = useState<'collapsed' | 'half' | 'expanded'>('half')
+
+  const showGraticuleRef = useRef(showGraticule)
+  useEffect(() => {
+    showGraticuleRef.current = showGraticule
+  }, [showGraticule])
 
   // Sync lang state to localStorage
   useEffect(() => {
@@ -428,7 +482,7 @@ function App() {
     if (map.getLayer('equator-line')) {
       map.setLayoutProperty('equator-line', 'visibility', visibility)
     }
-  }, [showGraticule, mapRenderTick])
+  }, [showGraticule])
 
   // Memoize search/filter results
   const regionsList = useMemo(() => {
@@ -553,11 +607,16 @@ function App() {
         })
       }
 
+      const visibility = showGraticuleRef.current ? 'visible' : 'none'
+
       if (!map.getLayer('graticule-lines')) {
         map.addLayer({
           id: 'graticule-lines',
           type: 'line',
           source: 'graticule',
+          layout: {
+            visibility,
+          },
           paint: {
             'line-color': '#64748b',
             'line-opacity': 0.15,
@@ -572,6 +631,9 @@ function App() {
           id: 'equator-line',
           type: 'line',
           source: 'equator',
+          layout: {
+            visibility,
+          },
           paint: {
             'line-color': '#ea580c',
             'line-opacity': 0.45,
@@ -584,18 +646,10 @@ function App() {
 
     map.on('load', () => {
       map.getCanvas().style.cursor = 'grab'
-      setMapRenderTick((value) => value + 1)
+      setIsMapLoaded(true)
     })
 
     map.on('style.load', handleStyleLoad)
-
-    const requestOverlayRender = () => {
-      setMapRenderTick((value) => value + 1)
-    }
-
-    map.on('move', requestOverlayRender)
-    map.on('zoom', requestOverlayRender)
-    map.on('resize', requestOverlayRender)
 
     mapRef.current = map
 
@@ -612,11 +666,6 @@ function App() {
     if (!map) return
     map.setStyle(MAP_STYLE_SPECS[mapStyle])
   }, [mapStyle])
-
-  // Trigger path updates on change of active countries
-  useEffect(() => {
-    setMapRenderTick((value) => value + 1)
-  }, [activeCountries])
 
   // Add country comparison instance
   function addCountry(countryId: string) {
@@ -742,7 +791,7 @@ function App() {
   }
 
   // Update country coordinates during drag
-  function updateCenterFromPointer(event: globalThis.PointerEvent, instanceId: string) {
+  const updateCenterFromPointer = useCallback((event: globalThis.PointerEvent, instanceId: string) => {
     const map = mapRef.current
     if (!map || !mapNodeRef.current) return
 
@@ -758,10 +807,10 @@ function App() {
           : item
       ),
     )
-  }
+  }, [])
 
   // Drag handler for SVG overlay path
-  function startOverlayDrag(event: PointerEvent<SVGPathElement>, instanceId: string) {
+  const startOverlayDrag = useCallback((event: PointerEvent<SVGPathElement>, instanceId: string) => {
     const map = mapRef.current
     if (!map) return
 
@@ -792,7 +841,7 @@ function App() {
     window.addEventListener('pointermove', handleMove)
     window.addEventListener('pointerup', handleEnd)
     window.addEventListener('pointercancel', handleEnd)
-  }
+  }, [updateCenterFromPointer])
 
   return (
     <main className="app-shell">
@@ -1235,20 +1284,15 @@ function App() {
           </button>
         </div>
 
-        <svg className="country-overlay" aria-hidden="true">
-          {mapRef.current &&
-            activeCountries.map((item) => (
-              <CountryOverlayPath
-                key={item.instanceId}
-                map={mapRef.current!}
-                country={item}
-                opacity={opacity}
-                showOutline={showOutline}
-                onDragStart={startOverlayDrag}
-                mapRenderTick={mapRenderTick}
-              />
-            ))}
-        </svg>
+        {isMapLoaded && mapRef.current && (
+          <CountrySvgOverlay
+            map={mapRef.current}
+            activeCountries={activeCountries}
+            opacity={opacity}
+            showOutline={showOutline}
+            onDragStart={startOverlayDrag}
+          />
+        )}
         <div className="map-hint" data-dragging={draggingInstanceId !== null}>
           {draggingInstanceId
             ? (lang === 'zh' ? '正在移动国家轮廓，观察其大小比例形变...' : 'Moving outline. Observe size deformation...')
