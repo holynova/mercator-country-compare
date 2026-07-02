@@ -966,14 +966,26 @@ h1 {
     max-height: none; /* controlled by container scroll */
   }
 
+  .map-hint {
+    top: 12px;
+    font-size: 11px;
+    padding: 6px 12px;
+    max-width: calc(100% - 24px);
+  }
+
   .map-controls-floating {
-    top: 16px;
+    top: 56px; /* Positioned below map-hint */
     bottom: auto;
     left: auto;
-    right: 16px;
+    right: 12px;
     flex-direction: column;
     gap: 8px;
     z-index: 90;
+  }
+
+  .style-selector-floating {
+    height: auto !important;
+    padding: 6px !important;
   }
   
   .panel-toggle-btn-inside, .panel-toggle-btn-floating {
@@ -985,6 +997,7 @@ h1 {
   .style-buttons-mini {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
+    gap: 4px;
   }
   
   .map-controls-floating {
