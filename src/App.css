@@ -920,7 +920,7 @@ h1 {
   }
 
   .panel.mobile-state-half {
-    transform: translateY(calc(100% - 280px));
+    transform: translateY(calc(100% - 330px));
   }
 
   .panel.mobile-state-expanded {
@@ -1046,14 +1046,66 @@ h1 {
   /* Sticky mobile footer controls */
   .panel-footer-mobile {
     display: flex;
-    gap: 10px;
+    flex-direction: column;
+    gap: 12px;
     padding: 12px 16px;
     border-top: 1px solid var(--border-color);
     background: var(--bg-card);
     z-index: 10;
   }
 
-  .panel-footer-mobile button {
+  .mobile-style-selector-footer {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 10px;
+  }
+
+  .mobile-style-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    text-align: left;
+  }
+
+  .mobile-style-buttons-row {
+    display: flex;
+    gap: 4px;
+    width: 100%;
+  }
+
+  .mobile-style-buttons-row .style-btn-mini {
+    flex: 1;
+    height: 30px;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 0;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-color);
+    background: var(--bg-hover);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: var(--transition);
+  }
+
+  .mobile-style-buttons-row .style-btn-mini.active {
+    background: var(--text-primary);
+    color: #ffffff;
+    border-color: transparent;
+  }
+
+  .mobile-action-buttons-row {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .panel-footer-mobile .reset-all-btn-mobile,
+  .panel-footer-mobile .btn-danger-mobile {
     flex: 1;
     height: 36px;
     display: flex;
@@ -1134,14 +1186,11 @@ h1 {
   }
 
   .map-hint {
-    top: 12px;
-    font-size: 11px;
-    padding: 6px 12px;
-    max-width: calc(100% - 24px);
+    display: none !important;
   }
 
   .map-controls-floating {
-    top: 56px; /* Positioned below map-hint */
+    top: 16px; /* Positioned back at top now that hint is gone */
     bottom: auto;
     left: auto;
     right: 12px;
@@ -1151,8 +1200,7 @@ h1 {
   }
 
   .style-selector-floating {
-    height: auto !important;
-    padding: 6px !important;
+    display: none !important;
   }
   
   .panel-toggle-btn-inside, .panel-toggle-btn-floating {

@@ -1145,24 +1145,46 @@ function App() {
 
         {/* 移动端常驻底部操作栏 */}
         <div className="panel-footer-mobile">
-          <button
-            type="button"
-            className="toggle-button reset-all-btn-mobile"
-            onClick={resetAllCountryCenters}
-            disabled={activeCountries.length === 0}
-          >
-            <ArrowsClockwise size={16} weight="bold" />
-            {t[lang].resetAll}
-          </button>
-          <button
-            type="button"
-            className="btn-danger btn-danger-mobile"
-            onClick={clearAllCountries}
-            disabled={activeCountries.length === 0}
-          >
-            <Trash size={16} weight="bold" />
-            {t[lang].clearBoard}
-          </button>
+          {/* 移动端地图样式选择器，横向排列 */}
+          <div className="mobile-style-selector-footer">
+            <span className="mobile-style-label">{t[lang].mapStyle}</span>
+            <div className="mobile-style-buttons-row">
+              {(['dark', 'light', 'voyager', 'minimal'] as MapStyle[]).map((style) => (
+                <button
+                  key={style}
+                  type="button"
+                  className={`style-btn-mini ${mapStyle === style ? 'active' : ''}`}
+                  onClick={() => setMapStyle(style)}
+                >
+                  {style === 'dark' && t[lang].styleDark}
+                  {style === 'light' && t[lang].styleLight}
+                  {style === 'voyager' && t[lang].styleColor}
+                  {style === 'minimal' && t[lang].styleOffline}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="mobile-action-buttons-row">
+            <button
+              type="button"
+              className="toggle-button reset-all-btn-mobile"
+              onClick={resetAllCountryCenters}
+              disabled={activeCountries.length === 0}
+            >
+              <ArrowsClockwise size={16} weight="bold" />
+              {t[lang].resetAll}
+            </button>
+            <button
+              type="button"
+              className="btn-danger btn-danger-mobile"
+              onClick={clearAllCountries}
+              disabled={activeCountries.length === 0}
+            >
+              <Trash size={16} weight="bold" />
+              {t[lang].clearBoard}
+            </button>
+          </div>
         </div>
       </aside>
 
