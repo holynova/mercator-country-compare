@@ -823,6 +823,12 @@ h1 {
   display: contents; /* transparent flow layout on desktop */
 }
 
+/* Hidden by default on desktop */
+.mobile-search-bar-container,
+.panel-footer-mobile {
+  display: none;
+}
+
 .country-overlay-path-dragged:hover {
   stroke-width: 3.5;
   filter: drop-shadow(0 0 8px var(--glow-color, rgba(236, 63, 145, 0.5)));
@@ -910,11 +916,11 @@ h1 {
 
   /* Three snapping states translated based on calc(100% - visible height) */
   .panel.mobile-state-collapsed {
-    transform: translateY(calc(100% - 56px));
+    transform: translateY(calc(100% - 62px));
   }
 
   .panel.mobile-state-half {
-    transform: translateY(calc(100% - 250px));
+    transform: translateY(calc(100% - 280px));
   }
 
   .panel.mobile-state-expanded {
@@ -934,6 +940,13 @@ h1 {
     z-index: 12;
   }
 
+  .mobile-pull-caret {
+    color: var(--text-muted);
+    opacity: 0.6;
+    margin-right: 6px;
+    flex-shrink: 0;
+  }
+
   .mobile-pull-handle-line {
     width: 36px;
     height: 4px;
@@ -947,9 +960,163 @@ h1 {
     opacity: 0.8;
   }
 
+  /* Hide default branding header in header on mobile */
+  .panel-header-mobile .brand-block {
+    display: none !important;
+  }
+  
   .panel-header-mobile {
     padding: 0 16px 8px 16px;
     border-bottom: 1px solid var(--border-color);
+  }
+
+  /* Mobile interactive search header */
+  .mobile-search-bar-container {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    width: 100%;
+    margin-top: 4px;
+  }
+
+  .mobile-search-bar {
+    display: flex;
+    align-items: center;
+    flex: 1;
+    height: 36px;
+    padding: 0 10px;
+    background: var(--bg-hover);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    transition: var(--transition);
+  }
+
+  .mobile-search-bar:focus-within {
+    border-color: var(--accent-border-active);
+    box-shadow: 0 0 0 2px rgba(236, 63, 145, 0.1);
+  }
+
+  .mobile-search-icon {
+    color: var(--text-muted);
+    margin-right: 8px;
+    flex-shrink: 0;
+  }
+
+  .mobile-search-input {
+    border: none;
+    background: transparent;
+    outline: none;
+    flex: 1;
+    font-size: 13px;
+    color: var(--text-primary);
+    font-weight: 500;
+    min-width: 0;
+  }
+
+  .mobile-search-clear-btn {
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px;
+    border-radius: 50%;
+  }
+
+  .mobile-search-clear-btn:hover {
+    background: rgba(0, 0, 0, 0.05);
+    color: var(--text-primary);
+  }
+
+  .mobile-lang-toggle {
+    flex-shrink: 0;
+    height: 36px;
+    padding: 0 12px;
+    font-size: 12px;
+    border-radius: var(--radius-sm);
+  }
+
+  /* Hide search bar inside scrollable body */
+  .country-picker-section .search-box {
+    display: none !important;
+  }
+
+  /* Sticky mobile footer controls */
+  .panel-footer-mobile {
+    display: flex;
+    gap: 10px;
+    padding: 12px 16px;
+    border-top: 1px solid var(--border-color);
+    background: var(--bg-card);
+    z-index: 10;
+  }
+
+  .panel-footer-mobile button {
+    flex: 1;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: var(--radius-sm);
+  }
+
+  .reset-all-btn-mobile {
+    background: var(--bg-hover);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: var(--transition);
+  }
+
+  .reset-all-btn-mobile:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .btn-danger-mobile {
+    background: var(--btn-danger-bg);
+    border: 1px solid transparent;
+    color: #ffffff;
+    cursor: pointer;
+    transition: var(--transition);
+  }
+
+  .btn-danger-mobile:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  /* Hide the desktop button grid inside body */
+  .panel-body-scrollable .button-grid-global,
+  .panel-body-scrollable .reset-all-btn {
+    display: none !important;
+  }
+
+  /* Presets pills horizontal scrolling */
+  .presets-pills {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    gap: 6px !important;
+    padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; /* Firefox */
+  }
+
+  .presets-pills::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+  }
+
+  .presets-pills button {
+    flex-shrink: 0 !important;
+    white-space: nowrap !important;
+    padding: 6px 12px !important;
+    font-size: 11px !important;
   }
 
   .panel-body-scrollable {

@@ -16,6 +16,10 @@ import {
   GithubLogo,
   CaretLeft,
   CaretRight,
+  CaretUp,
+  CaretDown,
+  MagnifyingGlass,
+  X,
 } from '@phosphor-icons/react'
 import maplibregl, {
   type LngLatLike,
@@ -801,6 +805,13 @@ function App() {
       >
         {/* 移动端顶部手势拉手条 */}
         <div className="mobile-pull-handle-bar" onClick={cycleMobilePanelState}>
+          {mobilePanelState === 'collapsed' ? (
+            <CaretUp size={12} weight="bold" className="mobile-pull-caret" />
+          ) : mobilePanelState === 'half' ? (
+            <CaretUp size={12} weight="bold" className="mobile-pull-caret" />
+          ) : (
+            <CaretDown size={12} weight="bold" className="mobile-pull-caret" />
+          )}
           <div className="mobile-pull-handle-line" />
         </div>
 
@@ -838,6 +849,48 @@ function App() {
                 {lang === 'zh' ? 'EN' : '中文'}
               </button>
             </div>
+          </div>
+
+          {/* 移动端专用的搜索栏组合条 */}
+          <div className="mobile-search-bar-container">
+            <div className="mobile-search-bar">
+              <MagnifyingGlass size={16} weight="bold" className="mobile-search-icon" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value)
+                  if (mobilePanelState !== 'expanded') {
+                    setMobilePanelState('expanded')
+                  }
+                }}
+                onFocus={() => {
+                  if (mobilePanelState !== 'expanded') {
+                    setMobilePanelState('expanded')
+                  }
+                }}
+                placeholder={t[lang].searchPlaceholder}
+                className="mobile-search-input"
+              />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery('')}
+                  className="mobile-search-clear-btn"
+                  title="清除搜索"
+                >
+                  <X size={14} weight="bold" />
+                </button>
+              )}
+            </div>
+            <button
+              type="button"
+              className="lang-toggle-btn mobile-lang-toggle"
+              onClick={() => setLang(lang === 'zh' ? 'en' : 'zh')}
+              title={lang === 'zh' ? 'Switch to English' : '切换至中文'}
+            >
+              {lang === 'zh' ? 'EN' : '中文'}
+            </button>
           </div>
         </div>
 
@@ -1088,10 +1141,29 @@ function App() {
           </button>
         </div>
 
-        <p className="note">
-          {t[lang].note}
-        </p>
         </div> {/* closing panel-body-scrollable */}
+
+        {/* 移动端常驻底部操作栏 */}
+        <div className="panel-footer-mobile">
+          <button
+            type="button"
+            className="toggle-button reset-all-btn-mobile"
+            onClick={resetAllCountryCenters}
+            disabled={activeCountries.length === 0}
+          >
+            <ArrowsClockwise size={16} weight="bold" />
+            {t[lang].resetAll}
+          </button>
+          <button
+            type="button"
+            className="btn-danger btn-danger-mobile"
+            onClick={clearAllCountries}
+            disabled={activeCountries.length === 0}
+          >
+            <Trash size={16} weight="bold" />
+            {t[lang].clearBoard}
+          </button>
+        </div>
       </aside>
 
       {/* 地图舞台区域 */}
