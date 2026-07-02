@@ -916,7 +916,7 @@ h1 {
 
   /* Three snapping states translated based on calc(100% - visible height) */
   .panel.mobile-state-collapsed {
-    transform: translateY(calc(100% - 62px));
+    transform: translateY(calc(100% - 80px));
   }
 
   .panel.mobile-state-half {
