@@ -21,6 +21,7 @@
 ### 🔗 相关链接
 - **GitHub Repository**: [https://github.com/holynova/mercator-country-compare](https://github.com/holynova/mercator-country-compare)
 - **在线演示 (GitHub Pages)**: [https://holynova.github.io/mercator-country-compare/](https://holynova.github.io/mercator-country-compare/)
+- **Cloudflare 静态演示**: [https://mercator-country-compare.xiaosang.cc/](https://mercator-country-compare.xiaosang.cc/)
 
 ---
 
@@ -41,10 +42,10 @@ An interactive map application to visually demonstrate and compare the true geom
 ### 🔗 Links
 - **GitHub Repository**: [https://github.com/holynova/mercator-country-compare](https://github.com/holynova/mercator-country-compare)
 - **Live Demo (GitHub Pages)**: [https://holynova.github.io/mercator-country-compare/](https://holynova.github.io/mercator-country-compare/)
+- **Cloudflare Static Demo**: [https://mercator-country-compare.xiaosang.cc/](https://mercator-country-compare.xiaosang.cc/)
 
 ## Demo 分享卡片
 
 [![mercator-country-compare Demo 分享卡片：包含项目介绍与二维码](assets/demo-share-card.png)](https://holynova.github.io/mercator-country-compare/)
 
 移动端友好的在线 Demo：地图投影形变实验室 - 在 Web Mercator 投影下对比各个国家的真实物理大小 扫码或点击卡片打开：<https://holynova.github.io/mercator-country-compare/>
-

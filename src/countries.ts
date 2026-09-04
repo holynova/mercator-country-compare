@@ -1,10 +1,11 @@
 import { feature } from 'topojson-client'
-import type { FeatureCollection } from 'geojson'
+import type { FeatureCollection, GeoJsonProperties, Position } from 'geojson'
 import atlas from 'world-atlas/countries-110m.json'
 import {
   getFeatureAreaKm2,
   getFeatureCenter,
   type CountryFeature,
+  type CountryGeometry,
   type CountryRecord,
 } from './geo'
 
@@ -92,7 +93,7 @@ const countryObjects = atlas.objects.countries as unknown as {
 const worldFeatures = feature(
   atlas as never,
   countryObjects as never,
-) as unknown as FeatureCollection
+) as unknown as FeatureCollection<CountryGeometry, GeoJsonProperties>
 
 // 将台湾几何合并到中国
 const chinaFeature = worldFeatures.features.find(
@@ -166,7 +167,7 @@ function buildVirtualRegion(regionName: string, countryNames: string[]): Country
   const matchingRecords = baseCountries.filter(c => countryNames.includes(c.sourceName))
   if (matchingRecords.length === 0) return null
 
-  const polygons: any[] = []
+  const polygons: Position[][][] = []
   matchingRecords.forEach(r => {
     const f = r.feature
     if (f.geometry.type === 'Polygon') {

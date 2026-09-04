@@ -4,8 +4,8 @@ import react from '@vitejs/plugin-react'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
-  base: '/mercator-country-compare/',
+  base: process.env.GITHUB_PAGES ? '/mercator-country-compare/' : './',
   build: {
-    outDir: 'docs',
+    outDir: process.env.GITHUB_PAGES ? 'docs' : 'dist',
   },
 })
