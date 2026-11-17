@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="1200" height="360" viewBox="0 0 1200 360"
+     role="img" aria-labelledby="title desc">
+  <title id="title">地图投影形变实验室 Mercator Lab — 在 Web Mercator 投影下对比国家真实大小</title>
+  <desc id="desc">深蓝海底配经纬网：左上标题地图投影形变实验室；右侧格陵兰在高纬被拉大成虚线轮廓，箭头指向赤道线上恢复真实大小的格陵兰，旁边是非洲轮廓作对比。</desc>
+
+  <rect width="1200" height="360" rx="26" fill="#0e2a33"/>
+
+  <g id="graticule" stroke="#1d4a57" stroke-width="1.5" fill="none" opacity="0.9">
+    <path d="M 760 30 V 330"/>
+    <path d="M 900 30 V 330"/>
+    <path d="M 1040 30 V 330"/>
+    <path d="M 700 90 H 1180"/>
+    <path d="M 700 210 H 1180"/>
+    <path d="M 700 300 H 1180"/>
+  </g>
+  <g id="equator" stroke="#f5c518" stroke-width="2" stroke-dasharray="8 6">
+    <line x1="700" y1="210" x2="1180" y2="210"/>
+  </g>
+  <g id="equator-label" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif">
+    <text x="1140" y="200" font-size="17" fill="#f5c518" text-anchor="end">赤道</text>
+  </g>
+
+  <g id="title-block" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif">
+    <text x="56" y="62" font-size="19" letter-spacing="3" fill="#8fc3cf">交互式地图 · INTERACTIVE MAP</text>
+    <text x="56" y="128" font-size="58" font-weight="700" fill="#f2f7f8">地图投影形变实验室</text>
+    <text x="56" y="168" font-size="23" fill="#cfe6ea">MERCATOR LAB — 把国家拖到赤道，看它真实的大小</text>
+    <text x="56" y="204" font-size="19" fill="#8fc3cf">格陵兰并没有非洲大。拖一拖，就知道了。</text>
+    <g id="chips" font-size="18" fill="#e8f2f4" text-anchor="middle">
+      <g><rect x="56" y="238" width="150" height="36" rx="18" fill="#16424e" stroke="#2c6a78" stroke-width="1.5"/><text x="131" y="262">6 个场景预设</text></g>
+      <g><rect x="218" y="238" width="168" height="36" rx="18" fill="#16424e" stroke="#2c6a78" stroke-width="1.5"/><text x="302" y="262">最多 8 国对比</text></g>
+      <g><rect x="398" y="238" width="126" height="36" rx="18" fill="#16424e" stroke="#2c6a78" stroke-width="1.5"/><text x="461" y="262">中英双语</text></g>
+      <g><rect x="536" y="238" width="150" height="36" rx="18" fill="#16424e" stroke="#2c6a78" stroke-width="1.5"/><text x="611" y="262">大圆球面平移</text></g>
+    </g>
+  </g>
+
+  <g id="diagram" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif">
+    <g id="greenland-stretched" fill="#e2725b" fill-opacity="0.28" stroke="#e2725b" stroke-width="2.5" stroke-dasharray="7 5">
+      <path d="M 850 40 L 980 48 L 1010 110 L 990 170 L 920 185 L 860 150 L 835 95 Z"/>
+    </g>
+    <text x="920" y="120" font-size="19" fill="#f0a08f" text-anchor="middle">格陵兰</text>
+    <text x="920" y="146" font-size="16" fill="#f0a08f" text-anchor="middle">高纬被拉大</text>
+    <g id="arrow" stroke="#f5c518" stroke-width="3" fill="none">
+      <path d="M 920 192 V 228"/>
+      <path d="M 910 220 L 920 232 L 930 220"/>
+    </g>
+    <g id="greenland-true" fill="#e2725b" stroke="#ffd9d0" stroke-width="2">
+      <path d="M 895 250 L 945 253 L 955 280 L 945 305 L 912 307 L 892 285 L 888 265 Z"/>
+    </g>
+    <text x="922" y="330" font-size="17" fill="#f0a08f" text-anchor="middle">真实大小</text>
+    <g id="africa" fill="#5cb85c" fill-opacity="0.85" stroke="#c8ecc8" stroke-width="2">
+      <path d="M 1050 228 L 1125 233 L 1145 268 L 1125 308 L 1090 322 L 1060 295 L 1045 260 Z"/>
+    </g>
+    <text x="1095" y="346" font-size="17" fill="#c8ecc8" text-anchor="middle">非洲 ≈ 14× 格陵兰</text>
+  </g>
+</svg>
