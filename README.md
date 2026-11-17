@@ -1,50 +1,76 @@
-# 地图投影形变实验室 (Mercator Lab)
+<p align="center">
+  <img src="./assets/readme/hero.svg" width="100%" alt="地图投影形变实验室 Mercator Lab — 格陵兰在高纬被拉大，拖到赤道恢复真实大小，非洲约 14 倍于格陵兰">
+</p>
 
-[English](#english) | [简体中文](#简体中文)
+<p align="center">
+  <a href="https://mercator-country-compare.xiaosang.cc/">▶ 在线体验 Live Demo</a>
+  ·
+  <a href="https://holynova.github.io/mercator-country-compare/">GitHub Pages 镜像</a>
+  ·
+  <a href="https://github.com/holynova/mercator-country-compare">GitHub 仓库</a>
+</p>
 
----
+地图投影形变实验室是一个交互式地图工具：把任意国家拖到赤道附近，直观看到它在 Web Mercator 投影下被拉大了多少。格陵兰在地图上看起来和非洲差不多大，拖到赤道才发现非洲约 14 倍于格陵兰。支持最多 8 个国家同时对比，附 6 个一键场景预设。
 
-## 简体中文
+Mercator Lab is an interactive map that shows how much Web Mercator inflates each country: drag any country toward the equator and watch it shrink to its true size. Greenland looks as big as Africa on a Mercator map — at the equator, Africa turns out to be about 14× Greenland. Compare up to 8 countries at once, with 6 one-click scenario presets.
 
-这是一个交互式地图工具，用于直观展示和对比 Web Mercator 投影下各国家与区域的真实几何面积形变。
+## 截图 / Screenshots
 
-### 🌟 核心功能
-- **球面平移算法**：基于大圆航线（Great-Circle）的球面位移计算，保证国家拖动时经纬双向各向同性收缩，无拉伸形变。
-- **双语多语言支持**：支持中/英文界面一键切换，并支持中/英文实时国家搜索。
-- **多国独立对比**：支持最多同时添加 8 个对比项，并可独立拖拽、重置或定位。
-- **经纬网与赤道参考线**：内置覆盖全球的经纬网辅助网格，并特别高亮了赤道线，直观量化形变倍数。
-- **场景预设演示**：内置“赤道大缩小”、“中美对比”、“非洲/格陵兰/南极洲有多大”等一键科学对比演示。
+<p align="center">
+  <img src="./assets/readme/screenshot.png" width="800" alt="非洲有多大预设：中、美、法、德、英、日六国并排放入非洲纬度对比，右侧为场景预设与对比管理面板">
+</p>
 
-### 📸 项目截图
-![Project Screenshot](./project_screenshot.jpg)
+## 功能 / Features
 
-### 🔗 相关链接
-- **GitHub Repository**: [https://github.com/holynova/mercator-country-compare](https://github.com/holynova/mercator-country-compare)
-- **在线演示 (GitHub Pages)**: [https://holynova.github.io/mercator-country-compare/](https://holynova.github.io/mercator-country-compare/)
+- **球面平移**：基于大圆航线（Great-Circle）的球面位移计算，拖动国家时经纬双向各向同性收缩，只变大小、不拉伸变形。
+- **多国对比**：最多同时添加 8 个国家，每个可独立拖拽、定位、重置；面积以平方公里实时显示。
+- **6 个场景预设**：赤道大缩小、中美横向对比、非洲有多大、格陵兰有多大、南极有多大、全球六大领土国，一键加载。
+- **虚拟大区**：除全球各国外，还可整体拖动「非洲」「西欧」两个大区做对比。
+- **中英双语**：界面一键切换中/英文，国家搜索支持中/英文实时搜索。
+- **经纬网与赤道线**：内置全球经纬网辅助网格与高亮赤道线，直观量化形变倍数；轮廓透明度、网格显示可调。
+- **4 种地图样式**：彩色、暗黑、明亮、离线（离线样式用本地数据渲染，无需联网加载底图）。
 
----
+## 玩法 / How to Use
+
+1. 在搜索框输入国家名（中文或英文），或点「推荐国家」「大洲与区域」添加。
+2. 拖动地图上的彩色国家轮廓，把它平移到赤道附近，对比前后大小。
+3. 点「经典对比场景预设」一键看预设好的对比，如把中、美、法、德、英、日并排放入非洲。
+
+## 本地运行 / Run Locally
+
+```bash
+npm install
+npm run dev      # 开发服务器
+npm run build    # 构建到 docs/（TypeScript 检查 + Vite 打包）
+npm run test     # Vitest 单元测试
+```
+
+## 技术 / Tech
+
+- React 19 + TypeScript + Vite；地图渲染用 MapLibre GL，球面几何用 d3-geo。
+- 国家边界数据来自 world-atlas（110m），经 topojson-client 解析；面积与中心点由 `src/geo.ts` 计算。
+- 中国轮廓含台湾地区（代码里把台湾要素合并进中国多边形后渲染）。
+
+```
+src/App.tsx         主界面：地图、侧栏、预设、样式切换
+src/countries.ts    国家数据：110m 世界地图 + 中文名 + 非洲/西欧虚拟大区
+src/geo.ts          球面几何：大圆平移、面积、中心点
+src/geo.test.ts     几何函数单元测试
+docs/               预构建产物（GitHub Pages 直接托管）
+```
 
 ## English
 
-An interactive map application to visually demonstrate and compare the true geometric size and projection deformation of countries under the Web Mercator projection.
+**Mercator Lab** is an interactive map for exploring Web Mercator distortion. Drag any country toward the equator and it shrinks isotropically to its true size — Greenland, which looks Africa-sized on a Mercator map, turns out to be about 1/14 of Africa.
 
-### 🌟 Features
-- **Spherical Translation**: Calculates movement using great-circle routes to ensure isotropic scaling (preserving shapes without stretching) when dragging.
-- **Bilingual Interface**: Seamless one-click switching between Chinese and English, supporting search queries in both languages.
-- **Multi-Country Comparison**: Compare up to 8 countries or regions side-by-side, each draggable, resettable, and locatable.
-- **Graticule & Equator**: Dynamic lat/lng grid lines and highlighted Equator line to quantify area expansion visually.
-- **Preset Scenarios**: One-click setups for "Equator Shrink", "US vs. China", and size comparisons of "Africa", "Greenland", and "Antarctica".
+- **Spherical translation**: movement follows great-circle routes, so a country shrinks equally along latitude and longitude without stretching.
+- **Compare up to 8 countries** at once, each draggable, locatable, and resettable; areas shown in km².
+- **6 presets**: Equator Shrink, China vs. USA, True Size of Africa, Size of Greenland, Size of Antarctica, Six Giants.
+- **Virtual regions**: drag the whole of Africa or Western Europe as single shapes.
+- **Bilingual**: one-click Chinese/English UI, with search in both languages. Graticule grid, highlighted equator, adjustable outline opacity, and 4 map styles (including an offline style that renders from local data).
+- **Run it**: `npm install && npm run dev`. Build: `npm run build`. Tests: `npm run test` (Vitest).
+- **Tech**: React 19 + TypeScript + Vite, MapLibre GL, d3-geo, topojson-client, world-atlas 110m.
 
-### 📸 Screenshot
-![Project Screenshot](./project_screenshot.jpg)
+## 许可 / License
 
-### 🔗 Links
-- **GitHub Repository**: [https://github.com/holynova/mercator-country-compare](https://github.com/holynova/mercator-country-compare)
-- **Live Demo (GitHub Pages)**: [https://holynova.github.io/mercator-country-compare/](https://holynova.github.io/mercator-country-compare/)
-
-## Demo 分享卡片
-
-[![mercator-country-compare Demo 分享卡片：包含项目介绍与二维码](assets/demo-share-card.png)](https://holynova.github.io/mercator-country-compare/)
-
-移动端友好的在线 Demo：地图投影形变实验室 - 在 Web Mercator 投影下对比各个国家的真实物理大小 扫码或点击卡片打开：<https://holynova.github.io/mercator-country-compare/>
-
+本仓库暂未添加 LICENSE 文件。
